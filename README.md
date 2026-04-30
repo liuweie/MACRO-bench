@@ -1,6 +1,6 @@
-# Multi-Agent Travel Benchmark
+# MACRO: A Benchmark for Clarification-Aware Multi-Agent Orchestration
 
-This repository provides a practical benchmark pipeline for evaluating multi-agent orchestration in the travel domain.
+This repository provides a practical benchmark pipeline for evaluating multi-agent orchestration.
 It includes task generation, trace collection, LLM/rule-based evaluation, and stability/consistency analysis scripts.
 
 ## Scope
