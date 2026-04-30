@@ -1,0 +1,59 @@
+{
+  "name": "Restaurant recommendation agent",
+  "description": " Recommend restaurant according to the location input by the user",
+  "url": "http://10.110.130.149:24103/7569927235994927147/a2a/",
+  "provider": {
+    "organization": "coze",
+    "url": ""
+  },
+  "version": "1.0.0",
+  "documentationUrl": "",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {
+    "customized": {
+      "type": "openIdConnect",
+      "openIdConnectUrl": ""
+    }
+  },
+  "security": [
+    {
+      "customized": [
+        "openid",
+        "profile",
+        "email"
+      ]
+    }
+  ],
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "image/png"
+  ],
+  "skills": [
+    {
+      "id": "1972965398500290561",
+      "name": "restaurant information recommendation",
+      "description": "Recommend restaurant according to the location input by the user, Only one lists of restaurant recommendation can be queried per request",
+      "tags": [],
+      "examples": [
+        "Can you recommend some restaurants near Wangfujing?"
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "image/png"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": true
+}

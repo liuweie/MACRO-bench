@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Evaluation - Agent Orchestrator Leaderboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                        },
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .card { background: white; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); }
+        .upload-area { border: 2px dashed #cbd5e1; transition: all 0.3s ease; }
+        .upload-area.dragover { border-color: #0ea5e9; background-color: #f0f9ff; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'dashboard' %}" class="text-slate-600 hover:text-slate-900 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-upload text-white text-sm"></i>
+                        </div>
+                        <h1 class="text-xl font-semibold text-slate-900">Submit Evaluation</h1>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="{% url 'dashboard' %}" class="text-slate-600 hover:text-slate-900 font-medium transition-colors">Leaderboard</a>
+                    <a href="{% url 'upload' %}" class="text-primary-600 font-medium border-b-2 border-primary-600 pb-1">Submit Evaluation</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Progress Steps -->
+            <div class="flex justify-between mb-12 relative">
+                <div class="flex-1 flex items-center">
+                    <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">1</div>
+                    <div class="ml-3">
+                        <div class="font-medium text-slate-900">Upload Files</div>
+                        <div class="text-sm text-slate-500">Provide trace data</div>
+                    </div>
+                </div>
+                <div class="flex-1 flex items-center justify-center">
+                    <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-semibold text-sm">2</div>
+                    <div class="ml-3">
+                        <div class="font-medium text-slate-500">Configure</div>
+                        <div class="text-sm text-slate-400">Set parameters</div>
+                    </div>
+                </div>
+                <div class="flex-1 flex items-center justify-end">
+                    <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-semibold text-sm">3</div>
+                    <div class="ml-3">
+                        <div class="font-medium text-slate-500">Submit</div>
+                        <div class="text-sm text-slate-400">Start evaluation</div>
+                    </div>
+                </div>
+                <div class="absolute top-4 left-8 right-8 h-0.5 bg-slate-200 -z-10">
+                    <div class="h-0.5 bg-primary-600 w-1/3"></div>
+                </div>
+            </div>
+
+            <div class="card rounded-xl p-8">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">Upload Evaluation Data</h2>
+                <p class="text-slate-600 mb-8">Submit your multi-agent orchestration trace files for benchmarking</p>
+
+                <form id="uploadForm" method="post" enctype="multipart/form-data" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Basic Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Campaign Name *</label>
+                            <input type="text" name="name" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                            <input type="text" name="description" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-700" placeholder="Brief description of this evaluation">
+                        </div>
+                    </div>
+
+                    <!-- Configuration -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Domain *</label>
+                            <select name="domain" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-700">
+                                <option value="">Select Domain</option>
+                                <option value="travel">Travel</option>
+                                <option value="hr">Human Resources</option>
+                                <option value="it">Information Technology</option>
+                                <option value="crm">Customer Relationship Management</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Orchestrator *</label>
+                            <select name="orchestrator" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-700">
+                                <option value="">Select Orchestrator</option>
+                                <option value="langchain">LangChain</option>
+                                <option value="magentic_one">Magentic One</option>
+                                <option value="crewai">CrewAI</option>
+                                <option value="strands">Strands</option>
+                                <option value="autogen">AutoGen</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">LLM Model *</label>
+                            <select name="llm_model" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-700">
+                                <option value="">Select LLM</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                <option value="claude-3-opus">Claude 3 Opus</option>
+                                <option value="qwen-72b">Qwen-72B</option>
+                                <option value="llama-2-70b">Llama 2 70B</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- File Uploads -->
+                    <div class="space-y-6">
+                        <!-- Trace File -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">
+                                Trace File (JSON/JSONL) *
+                            </label>
+                            <div class="upload-area rounded-lg p-8 text-center cursor-pointer" id="traceUploadArea">
+                                <input type="file" name="trace_file" accept=".json,.jsonl" required class="hidden" id="traceFile">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-slate-400 mb-3"></i>
+                                <p class="text-lg font-medium text-slate-900 mb-1">Upload trace file</p>
+                                <p class="text-sm text-slate-500">Drag & drop or click to browse</p>
+                                <p class="text-xs text-slate-400 mt-2">Supports .json and .jsonl formats</p>
+                            </div>
+                            <div id="traceFileName" class="mt-2 text-sm text-slate-600 hidden"></div>
+                        </div>
+
+                        <!-- Optional Config Files -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                    Task Configuration (Optional)
+                                </label>
+                                <div class="upload-area rounded-lg p-6 text-center cursor-pointer" id="taskConfigUploadArea">
+                                    <input type="file" name="task_config" accept=".yaml,.yml" class="hidden" id="taskConfigFile">
+                                    <i class="fas fa-cog text-2xl text-slate-400 mb-2"></i>
+                                    <p class="text-sm font-medium text-slate-900 mb-1">Task config</p>
+                                    <p class="text-xs text-slate-500">tasks.yaml (optional)</p>
+                                </div>
+                                <div id="taskConfigFileName" class="mt-2 text-sm text-slate-600 hidden"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">
+                                    Agent Configuration (Optional)
+                                </label>
+                                <div class="upload-area rounded-lg p-6 text-center cursor-pointer" id="agentConfigUploadArea">
+                                    <input type="file" name="agent_config" accept=".json,.yaml,.yml" class="hidden" id="agentConfigFile">
+                                    <i class="fas fa-robot text-2xl text-slate-400 mb-2"></i>
+                                    <p class="text-sm font-medium text-slate-900 mb-1">Agent config</p>
+                                    <p class="text-xs text-slate-500">agents.json (optional)</p>
+                                </div>
+                                <div id="agentConfigFileName" class="mt-2 text-sm text-slate-600 hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evaluation Settings -->
+                    <div class="border-t border-slate-200 pt-6">
+                        <h3 class="text-lg font-medium text-slate-900 mb-4">Evaluation Settings</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Evaluator Type</label>
+                                <select name="evaluator_type" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-700">
+                                    <option value="rule_based">Rule Based</option>
+                                    <option value="llm_enhanced">LLM Enhanced</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Max Traces (Optional)</label>
+                                <input type="number" name="max_traces" min="1" max="1000" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-700" placeholder="Process all traces">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end pt-6 border-t border-slate-200">
+                        <button type="submit" class="bg-primary-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors flex items-center">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Start Evaluation
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Help Section -->
+            <div class="mt-8 bg-primary-50 rounded-xl p-6 border border-primary-100">
+                <h3 class="text-lg font-semibold text-primary-900 mb-4">Evaluation Guidelines</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="font-medium text-primary-800 mb-2">File Format</h4>
+                        <p class="text-sm text-primary-700">Upload JSON/JSONL files containing agent interaction traces from your orchestrator.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-primary-800 mb-2">Configuration</h4>
+                        <p class="text-sm text-primary-700">Optional YAML/JSON configs help improve evaluation accuracy and domain-specific metrics.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-medium text-primary-800 mb-2">Processing Time</h4>
+                        <p class="text-sm text-primary-700">Evaluations typically take 2-10 minutes depending on trace size and complexity.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-8 mt-12">
+        <div class="container mx-auto px-4 text-center text-sm text-slate-500">
+            <p>&copy; 2024 Agent Orchestrator Leaderboard. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // File upload handlers
+            const setupFileUpload = (areaId, fileInputId, fileNameId) => {
+                const area = document.getElementById(areaId);
+                const fileInput = document.getElementById(fileInputId);
+                const fileName = document.getElementById(fileNameId);
+
+                area.addEventListener('click', () => fileInput.click());
+                
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+
+                area.addEventListener('dragleave', () => {
+                    area.classList.remove('dragover');
+                });
+
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    fileInput.files = e.dataTransfer.files;
+                    updateFileName(fileInput, fileName);
+                });
+
+                fileInput.addEventListener('change', () => {
+                    updateFileName(fileInput, fileName);
+                });
+            };
+
+            const updateFileName = (fileInput, fileNameElement) => {
+                if (fileInput.files.length > 0) {
+                    fileNameElement.textContent = `Selected: ${fileInput.files[0].name}`;
+                    fileNameElement.classList.remove('hidden');
+                } else {
+                    fileNameElement.classList.add('hidden');
+                }
+            };
+
+            // Setup all file upload areas
+            setupFileUpload('traceUploadArea', 'traceFile', 'traceFileName');
+            setupFileUpload('taskConfigUploadArea', 'taskConfigFile', 'taskConfigFileName');
+            setupFileUpload('agentConfigUploadArea', 'agentConfigFile', 'agentConfigFileName');
+
+            // Form submission
+            document.getElementById('uploadForm').addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                submitBtn.disabled = true;
+            });
+        });
+    </script>
+</body>
+</html>

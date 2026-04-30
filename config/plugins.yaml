@@ -1,0 +1,129 @@
+# 插件配置
+enabled: true
+
+# 插件搜索路径
+plugin_dirs:
+  - "plugins/"
+  - "custom_plugins/"
+  - "${HOME}/.cogbenchmark/plugins/"
+
+# 要加载的插件模块
+plugin_modules:
+  - plugins.travel_domain_plugin
+  - plugins.travel_evaluator_plugin
+  - plugins.latc_orchestrator_plugin
+  - plugins.html_reporter_plugin
+  - plugins.json_reporter_plugin
+  - plugins.otel_evaluator_plugin
+
+# 插件加载顺序（数字越小越先加载）
+plugin_priority:
+  # module-level priorities (fallback if class-level name not matched)
+  latc_orchestrator_plugin: 5
+  travel_domain_plugin: 12
+  travel_evaluator_plugin: 14
+  otel_evaluator_plugin: 15
+  html_reporter_plugin: 20
+  json_reporter_plugin: 30
+  # class-level priorities used by PluginManager for fine-grained ordering
+  LatcOrchestratorClient: 5
+  LatcOrchestratorPlugin: 5
+  TravelDomainPlugin: 12
+  TravelEvaluatorPlugin: 14
+  HTMLReporterPlugin: 20
+  JsonReporterPlugin: 30
+  OtelEvaluatorPlugin: 15
+
+# 插件配置
+plugins:
+  travel_domain_plugin:
+    enabled: true
+    config:
+      version: "1.0.0"
+      features: ["dates", "destinations", "budgets"]
+      domains_supported: ["travel", "tourism"]
+  travel_evaluator_plugin:
+    enabled: true
+    config: {}
+  latc_orchestrator_plugin:
+    enabled: true
+    config:
+      url: "http://10.110.130.149:24003/built-in/v1/agent/routing"
+      description: "Orchestrator adapter for stream parsing"
+  html_reporter_plugin:
+    enabled: true
+    config:
+      output_dir: "output"
+      template: "default"
+  json_reporter_plugin:
+    enabled: true
+    config:
+      output_dir: "output"
+  otel_evaluator_plugin:
+    enabled: true
+    config:
+      tracing_enabled: true
+      metrics_enabled: true
+      service_name: "cogbenchmark_evaluator"
+
+
+# hook chaining configuration (used by multi-plugin orchestration design)
+hook_chains:
+  orchestrator:
+    default_chain:
+      - latc_orchestrator_plugin
+      - travel_orchestrator_plugin
+  evaluator:
+    travel:
+      - otel_evaluator_plugin
+  reporter:
+    travel_primary:
+      - html_reporter_plugin
+      - json_reporter_plugin
+
+
+# domain specific mappings for future multi-domain support
+domains:
+  travel:
+    orchestrator_type: LATC
+    orchestrator_chain: [latc_orchestrator_plugin]
+    evaluator_chain: [otel_evaluator_plugin, travel_evaluator_plugin]
+    reporter_chain: [html_reporter_plugin, json_reporter_plugin]
+    user_simulator_plugin: travel_domain_plugin
+  default:
+    orchestrator_type: LATC
+    orchestrator_chain: [latc_orchestrator_plugin]
+    evaluator_chain: [otel_evaluator_plugin]
+    reporter_chain: [html_reporter_plugin]
+
+
+# 自动发现设置
+auto_discovery:
+  enabled: true
+  scan_interval: 300  # 5分钟
+  hot_reload: false
+
+# 插件依赖管理
+dependencies:
+  required_plugins:
+    - travel_domain_plugin
+    - travel_orchestrator_plugin
+    - travel_evaluator_plugin
+  optional_plugins:
+    - html_reporter_plugin
+    - json_reporter_plugin
+    - otel_evaluator_plugin
+    
+
+# 控制台输出选项
+logging:
+  show_plugin_summary: true
+  show_plugin_pipeline: true
+  show_full_conversation: true
+
+# 插件验证
+validation:
+  enabled: true
+  check_hook_implementations: true
+  validate_configs: true
+  timeout: 30

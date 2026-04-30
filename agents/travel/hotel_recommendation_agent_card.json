@@ -1,0 +1,59 @@
+{
+  "name": "Hotel Recommendation Agent",
+  "description": "Recommend hotels according to the city",
+  "url": "http://10.110.130.149:24103/7570182060523077695/a2a/",
+  "provider": {
+    "organization": "coze",
+    "url": ""
+  },
+  "version": "1.0.0",
+  "documentationUrl": "",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {
+    "customized": {
+      "type": "openIdConnect",
+      "openIdConnectUrl": ""
+    }
+  },
+  "security": [
+    {
+      "customized": [
+        "openid",
+        "profile",
+        "email"
+      ]
+    }
+  ],
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "image/png"
+  ],
+  "skills": [
+    {
+      "id": "1972965398500290561",
+      "name": "Hotel accommodation information inquiry",
+      "description": "Recommend hotels and accommodation based on the city entered by the user. Only one recommendation operation can be performed per request.",
+      "tags": [],
+      "examples": [
+        "Please recommend a hotel near Wangfujing."
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "image/png"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": true
+}

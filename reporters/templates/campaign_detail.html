@@ -1,0 +1,148 @@
+++ Begin File
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Campaign Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0b1020; color: #fff; }
+    .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.08); border-radius: 8px; }
+    pre.json { background: rgba(0,0,0,0.6); padding: 0.5rem; border-radius: 6px; overflow:auto; max-height: 320px; }
+    .btn { background: rgba(255,255,255,0.04); padding: 0.4rem 0.8rem; border-radius: 6px; }
+  </style>
+</head>
+<body class="min-h-screen p-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-semibold">Campaign Details</h1>
+        <div class="text-sm muted mt-1">{{ campaign.name }} · {{ campaign.domain.display_name }} · {{ campaign.orchestrator.display_name }}</div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="{% url 'dashboard' %}" class="btn">← Back to Dashboard</a>
+      </div>
+    </div>
+
+    <div class="card p-4 mb-6">
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <div class="text-xs muted">Campaign ID</div>
+          <div class="font-mono text-sm">{{ campaign.id }}</div>
+        </div>
+        <div>
+          <div class="text-xs muted">Evaluator Type</div>
+          <div>{{ campaign.evaluator_type }}</div>
+        </div>
+        <div>
+          <div class="text-xs muted">Status</div>
+          <div>{{ campaign.status }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-4 mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-sm muted">Result files</div>
+        <div class="flex gap-2">
+          {% if results_summary_url %}
+            <a href="{{ results_summary_url }}" class="btn" target="_blank" rel="noopener">Download Summary</a>
+          {% endif %}
+          {% if results_detailed_url %}
+            <a href="{{ results_detailed_url }}" class="btn" target="_blank" rel="noopener">Download Detailed</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-4 mb-6">
+      <h2 class="text-lg font-medium mb-3">Results</h2>
+      <div class="text-sm muted mb-3">Total results found: {{ result_count }} · Page {{ page_obj.number }} of {{ paginator.num_pages }}</div>
+
+      <div class="overflow-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="text-xs muted border-b border-gray-700">
+              <th class="py-2 px-2">#</th>
+              <th class="py-2 px-2">Transaction</th>
+              <th class="py-2 px-2">Overall</th>
+              <th class="py-2 px-2">Business</th>
+              <th class="py-2 px-2">Orch.</th>
+              <th class="py-2 px-2">Efficiency</th>
+              <th class="py-2 px-2">Performance</th>
+              <th class="py-2 px-2">Raw</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+            <tr class="border-b border-gray-800">
+              <td class="py-2 px-2">{{ r.index }}</td>
+              <td class="py-2 px-2 font-mono text-xs">{{ r.transaction_id|default:"-" }}</td>
+              <td class="py-2 px-2">{{ r.overall_score|default:"-"|floatformat:2 }}</td>
+              <td class="py-2 px-2">{{ r.business_score|default:"-"|floatformat:2 }}</td>
+              <td class="py-2 px-2">{{ r.orchestration_score|default:"-"|floatformat:2 }}</td>
+              <td class="py-2 px-2">{{ r.efficiency_score|default:"-"|floatformat:2 }}</td>
+              <td class="py-2 px-2">{{ r.performance_score|default:"-"|floatformat:2 }}</td>
+              <td class="py-2 px-2">
+                <button class="btn toggle-raw" data-target="#raw-{{ r.id }}">Toggle Raw</button>
+              </td>
+            </tr>
+            <tr id="raw-{{ r.id }}" class="bg-black/30 hidden">
+              <td colspan="8" class="p-3">
+                <pre class="json">{{ r.raw_session|default:"{}"|safe }}</pre>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination controls -->
+      <div class="mt-4 flex items-center justify-between">
+        <div class="text-sm muted">
+          {% if page_obj.has_previous %}
+            <a href="{% url 'campaign_detail' campaign.id %}?page={{ page_obj.previous_page_number }}" class="btn">← Prev</a>
+          {% else %}
+            <span class="btn" aria-disabled="true">← Prev</span>
+          {% endif %}
+        </div>
+        <div class="text-sm muted">
+          {% for item in page_range_display %}
+            {% if item == '...' %}
+              <span class="mx-1">…</span>
+            {% elif item == page_obj.number %}
+              <strong class="mx-1 px-2">{{ item }}</strong>
+            {% else %}
+              <a href="{% url 'campaign_detail' campaign.id %}?page={{ item }}" class="mx-1 px-2">{{ item }}</a>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <div class="text-sm muted">
+          {% if page_obj.has_next %}
+            <a href="{% url 'campaign_detail' campaign.id %}?page={{ page_obj.next_page_number }}" class="btn">Next →</a>
+          {% else %}
+            <span class="btn" aria-disabled="true">Next →</span>
+          {% endif %}
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.toggle-raw').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const tgt = btn.getAttribute('data-target');
+          const el = document.querySelector(tgt);
+          if (!el) return;
+          if (el.classList.contains('hidden')) el.classList.remove('hidden'); else el.classList.add('hidden');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
+++ End File

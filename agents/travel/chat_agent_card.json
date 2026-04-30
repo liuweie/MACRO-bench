@@ -1,0 +1,61 @@
+{
+    "name": "chat agent",
+    "description": "Focus on addressing users' needs for answering various casual conversation questions, covering scenarios such as daily Q&A, life topics, and interest exchanges.",
+    "url": "https://aiforceuat.customized.com.cn/aiforceplatformapi/a2a/debugsse/1980208538521817088/stream",
+    "provider": {
+        "organization": "ycc123456",
+        "url": ""
+    },
+    "version": "1.0.0",
+    "documentationUrl": "",
+    "capabilities": {
+        "streaming": true,
+        "pushNotifications": true,
+        "stateTransitionHistory": false
+    },
+    "securitySchemes": {
+        "customized": {
+            "type": "openIdConnect",
+            "openIdConnectUrl": ""
+        }
+    },
+    "security": [
+        {
+            "customized": [
+                "openid",
+                "profile",
+                "email"
+            ]
+        }
+    ],
+    "defaultInputModes": [
+        "application/json",
+        "text/plain"
+    ],
+    "defaultOutputModes": [
+        "application/json",
+        "image/png"
+    ],
+    "skills": [
+        {
+            "id": "1980208538903498754",
+            "name": "User Question Answering",
+            "description": "Focus on addressing users' needs for answering various casual conversation questions, covering scenarios such as daily Q&A, life topics, and interest exchanges.",
+            "tags": [],
+            "examples": ["What's the weather like today?"],
+            "inputModes": [
+                "application/json",
+                "text/plain"
+            ],
+            "outputModes": [
+                "application/json",
+                "image/png"
+            ]
+        }
+    ],
+    "supportsAuthenticatedExtendedCard": true
+}
+
+
+
+

@@ -1,0 +1,59 @@
+{
+  "name": "Itinerary Planning Agent",
+  "description": "Plan structured multi-day travel itineraries with clear daily and time-based schedules",
+  "url": "http://10.110.130.149:24103/7570184379914797066/a2a/",
+  "provider": {
+    "organization": "coze",
+    "url": ""
+  },
+  "version": "1.0.0",
+  "documentationUrl": "",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {
+    "customized": {
+      "type": "openIdConnect",
+      "openIdConnectUrl": ""
+    }
+  },
+  "security": [
+    {
+      "customized": [
+        "openid",
+        "profile",
+        "email"
+      ]
+    }
+  ],
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "image/png"
+  ],
+  "skills": [
+    {
+      "id": "1972965398500290561",
+      "name": "Itinerary Generation",
+      "description": "Plan comprehensive travel itineraries based on the user's provided departure location, destination, number of days, and other information, covering aspects such as transportation options and must-visit attractions.",
+      "tags": [],
+      "examples": [
+        "Help me plan a 3-day trip to Beijing."
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "image/png"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": true
+}

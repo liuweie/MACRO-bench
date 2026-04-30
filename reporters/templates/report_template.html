@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="{{ lang if (lang is defined) else 'zh' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% set lang = lang if (lang is defined) else 'en' %}
+    {% if lang == 'en' %}
+        {% set L = {
+            'page_title':'Multi-Agent Orchestrator Benchmark Report',
+            'test_date':'Test Date',
+            'command_label':'Command:',
+            'statistics':'Statistics',
+            'metric_overall_score':'Overall Score',
+            'metric_task_success_rate':'Task Success Rate',
+            'metric_task_complete_rate':'Task Complete Rate',
+            'metric_execution_efficiency':'Execution Efficiency',
+            'evaluator_metrics':'Evaluator Metrics',
+            'select_iteration':'Select Iteration',
+            'switch_iteration':'Switch to view only the selected iteration',
+            'all_iterations':'All Iterations',
+            'iteration_results':'Iteration Results',
+            'overall_scorer':'Overall Orchestration Score Trend',
+            'overall_tsr':'User Success Rate Trend',
+            'overall_latency':'Orchestration Latency Trend (s)',
+            'tasks_in_iteration':'Tasks in this iteration',
+            'task_details':'Task Details',
+            'task_id':'Task ID',
+            'query':'Query',
+            'level':'Level',
+            'exec_time':'Exec Time (s)',
+            'overall_score_col':'Overall Score (0-1)',
+            'status':'Status',
+            'failure_reason':'Failure Reason',
+            'execution_time_col':'Execution Time',
+            'action':'Action',
+            'details':'Details',
+            'show_json':'Show JSON',
+            'hide_json':'Hide JSON',
+            'copy_json':'Copy JSON',
+            'copied':'Copied',
+            'search_placeholder':'Search conversation...',
+            'total_tasks':'Total Tasks',
+            'mean_of_per_task':'Mean per-task orchestration score (avg %)',
+            'avg_rounds_per_task_label':'Avg rounds per task',
+            'avg_agents_per_task_label':'Avg agents per task',
+            'weight_label':'Weight',
+            'mean_score':'Mean score:',
+            'success_rate':'Success Rate:',
+            'avg_time':'Avg Time:',
+            'pass_text':'PASS',
+            'fail_text':'FAIL',
+            'conversation_log':'Conversation Log',
+            'no_conversation':'No conversation history available for this task.',
+            'validation_checks':'Validation Rule Checks',
+            'no_validation':'No validation rules or diagnostics available.',
+            'final_output_rule_scores':'Final-output Rule Scores'
+        } %}
+    {% else %}
+        {% set L = {
+            'page_title':'多代理编排基准报告',
+            'test_date':'测试日期',
+            'command_label':'命令：',
+            'statistics':'统计',
+            'metric_overall_score':'总体得分',
+            'metric_task_success_rate':'任务成功率',
+            'metric_task_complete_rate':'任务完成率',
+            'metric_execution_efficiency':'执行效率',
+            'evaluator_metrics':'评估指标',
+            'select_iteration':'选择迭代',
+            'switch_iteration':'切换以仅查看所选迭代',
+            'all_iterations':'所有迭代',
+            'iteration_results':'迭代结果',
+            'overall_scorer':'总体编排得分走势',
+            'overall_tsr':'用户成功率走势',
+            'overall_latency':'编排延迟走势 (秒)',
+            'tasks_in_iteration':'该迭代的任务',
+            'task_details':'任务详情',
+            'task_id':'任务 ID',
+            'query':'查询',
+            'level':'级别',
+            'exec_time':'执行时间 (s)',
+            'overall_score_col':'总体编排得分 (0-1)',
+            'status':'状态',
+            'failure_reason':'失败原因',
+            'execution_time_col':'执行时间',
+            'action':'操作',
+            'details':'详情',
+            'show_json':'显示 JSON',
+            'hide_json':'隐藏 JSON',
+            'copy_json':'复制 JSON',
+            'copied':'已复制',
+            'search_placeholder':'搜索对话...',
+            'total_tasks':'总任务数',
+            'mean_of_per_task':'每任务编排得分均值 (%)',
+            'avg_rounds_per_task_label':'平均每任务轮次',
+            'avg_agents_per_task_label':'平均每任务智能体数',
+            'weight_label':'权重',
+            'mean_score':'平均得分：',
+            'success_rate':'成功率：',
+            'avg_time':'平均时间：',
+            'pass_text':'通过',
+            'fail_text':'未通过',
+            'conversation_log':'对话日志',
+            'no_conversation':'该任务无对话记录。',
+            'validation_checks':'验证规则检查',
+            'no_validation':'没有可用的验证规则或诊断。',
+            'final_output_rule_scores':'最终输出规则得分'
+        } %}
+    {% endif %}
+    <title>{{ L.page_title }}</title>
+    <script src="./static/chart.umd.min.js"></script>
+    <!-- If a local Tailwind build isn't available, we use the bundled CDN script saved locally as tailwind.cdn.js -->
+    <script src="./static/tailwind.cdn.js"></script>
+    <link rel="stylesheet" href="./static/report.css">
+</head>
+<body>
+    <div class="max-w-7xl mx-auto p-6">
+        <header class="bg-gray-900 text-white rounded-lg p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="min-w-0">
+                    <h1 class="text-3xl font-semibold">{{ L.page_title }}</h1>
+                    <p class="text-gray-300 mt-1">{{ L.test_date }}: {{ date }}</p>
+                    {% if command %}
+                    <p class="text-gray-300 mt-1 break-words whitespace-pre-wrap" title="{{ command }}"><strong>{{ L.command_label }}</strong> <span class="font-mono text-sm text-gray-200 break-words whitespace-pre-wrap">{{ command }}</span></p>
+                    {% endif %}
+                </div>
+                    <div class="text-right text-sm text-gray-400" style="flex:0 0 auto;">
+                        <div>{{ L.metric_overall_score }}: <span class="font-medium text-white">{{ (overall_score_value * 100) | round(2) }}%</span></div>
+                        <div class="mt-1">{{ L.metric_task_success_rate }}: <span class="font-medium text-white">{{ (task_success_value * 100) | round(2) }}%</span></div>
+                        <div class="mt-1">{{ L.mean_of_per_task }}: <span class="font-medium text-white">{{ (overall_score_run * 100) | round(2) }}%</span></div>
+                        <div class="mt-1">{{ L.total_tasks }}: <span class="font-medium text-white">{{ total_tasks }}</span></div>
+                        <div class="mt-1">{{ L.avg_rounds_per_task_label }}: <span class="font-medium text-white">{{ average_rounds_per_task | round(2) }}</span></div>
+                        <div class="mt-1">{{ L.avg_agents_per_task_label }}: <span class="font-medium text-white">{{ average_agents_used | round(2) }}</span></div>
+                    </div>
+            </div>
+        </header>
+
+        <section class="mb-6">
+            <h2 class="text-2xl font-semibold mb-4">{{ L.statistics }}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {% for card in metric_cards %}
+                <div class="bg-gradient-to-r from-indigo-500 to-indigo-400 text-white shadow-lg rounded-lg p-4 text-center">
+                    <h3 class="text-sm font-medium">{{ L.get(card.label_key, card.label_key) }}</h3>
+                    <p class="text-2xl font-bold">{{ (card.value * 100) | round(2) }}%</p>
+                    {% if card.weight is not none %}
+                    <p class="text-xs mt-1">{{ L.weight_label }} {{ (card.weight * 100) | round(0) }}%</p>
+                    {% endif %}
+                    {% if card.description %}
+                    <p class="text-xs mt-1">{{ card.description }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Evaluator metrics docs (collapsible) -->
+        <section class="mb-6">
+            <details class="bg-white shadow rounded-md p-4" open>
+                <summary class="text-lg font-medium cursor-pointer">{{ L.evaluator_metrics }}</summary>
+                <div class="mt-3 prose">
+                                        <!-- Metrics summary cards + Raw markdown injected here and rendered by report.js -->
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                                            {% for m in evaluator_metrics %}
+                                            {% set metric_value = m.value if (m.value is not none) else 0 %}
+                                            {% set pct = (metric_value * 100) | round(1) %}
+                                            {% if metric_value >= 0.75 %}
+                                                {% set bar_class = 'bg-emerald-500' %}
+                                                {% set badge_classes = 'bg-emerald-100 text-emerald-800' %}
+                                            {% elif metric_value >= 0.5 %}
+                                                {% set bar_class = 'bg-yellow-400' %}
+                                                {% set badge_classes = 'bg-yellow-100 text-yellow-800' %}
+                                            {% elif metric_value >= 0.25 %}
+                                                {% set bar_class = 'bg-orange-400' %}
+                                                {% set badge_classes = 'bg-orange-100 text-orange-800' %}
+                                            {% else %}
+                                                {% set bar_class = 'bg-red-500' %}
+                                                {% set badge_classes = 'bg-red-100 text-red-800' %}
+                                            {% endif %}
+                                            <div class="bg-white p-4 rounded-lg shadow-sm border metric-card">
+                                                <div class="flex items-start justify-between">
+                                                    <div>
+                                                        <h4 class="text-sm font-semibold text-gray-800">{{ L.get(m.name, m.name) }}</h4>
+                                                        <p class="text-xs text-gray-500 mt-1">{{ m.description }}</p>
+                                                    </div>
+                                                    {% if m.weight is not none %}
+                                                    <div class="text-right">
+                                                        <span class="text-xs text-gray-600">{{ L.weight_label }}</span>
+                                                        <div class="mt-1 inline-flex items-center px-2 py-1 rounded-full metric-weight-badge text-xs font-medium {{ badge_classes }}">{{ (m.weight * 100) | round(0) }}%</div>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="mt-3">
+                                                    <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden metric-bar">
+                                                        <div class="h-2 rounded-full {{ bar_class }}" style="width: {{ pct }}%;"></div>
+                                                    </div>
+                                                    <div class="mt-2 text-xs text-gray-600">{{ L.mean_score }} <span class="font-medium">{{ pct }}%</span></div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <pre class="evaluator-docs-raw" style="display:none">评估指标快速参考（简要）
+
+The travel evaluator emits the following normalised scores (0-1 range):
+
+- overall_score — blended aggregate of the component metrics listed below.
+- task_success_rate — proportion of tasks whose user-side milestones were all satisfied.
+- task_complete_rate — average completion ratio across all user milestones.
+- execution_efficiency — milestone completion divided by the number of distinct agents engaged.
+
+Default metric weights used for the overall score:
+
+- task_success_rate: 33%
+- task_complete_rate: 33%
+- execution_efficiency: 34%
+
+All per-task values feed directly into the summary cards and downstream JSON/HTML reports.
+                                        </pre>
+                    <div class="evaluator-docs-render"></div>
+                </div>
+            </details>
+        </section>
+
+        <!-- Iteration selector: affects all iteration-related blocks (except the top statistics cards) -->
+        <div class="flex items-center justify-between mb-4 space-x-4">
+            <div>
+                <label for="iteration-select" class="block text-sm font-medium text-gray-700">{{ L.select_iteration }}</label>
+                <select id="iteration-select" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="all">{{ L.all_iterations }}</option>
+                    {% for iteration in iterations %}
+                    <option value="{{ loop.index }}">Iteration {{ loop.index }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="text-sm text-gray-500">{{ L.switch_iteration }}</div>
+        </div>
+
+        <section id="iterations-area" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">{{ L.iteration_results }}</h2>
+            <div class="space-y-4">
+                {% for iteration in iterations %}
+                <div class="bg-white shadow rounded-md p-4" data-iteration="{{ loop.index }}">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium">Iteration {{ loop.index }}</h3>
+                            <p class="text-sm text-gray-500">{{ L.total_tasks }}: <span class="font-medium text-gray-700">{{ iteration.total_tasks }}</span></p>
+                        </div>
+                        <div class="text-right text-sm text-gray-600">
+                            <div>{{ L.success_rate }} <span class="font-medium">{{ "%.2f"|format(iteration.success_rate * 100) }}%</span></div>
+                            <div class="mt-1">{{ L.avg_time }} <span class="font-medium">{{ "%.2f"|format(iteration.average_time_per_task) }}s</span></div>
+                        </div>
+                    </div>
+                    {% if iteration.tasks %}
+                    <div class="mt-4" style="min-height:360px;">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-white p-3 rounded shadow">
+                                            <h5 class="text-sm font-medium text-gray-700 mb-2">{{ L.overall_scorer }}</h5>
+                                <div style="min-height:260px;">
+                                    <canvas id="chart-iter-{{ loop.index }}-scorer" data-iteration="{{ loop.index }}" class="w-full h-64" style="min-height:260px; max-height:360px;"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white p-3 rounded shadow">
+                                <h5 class="text-sm font-medium text-gray-700 mb-2">{{ L.overall_tsr }}</h5>
+                                <div style="min-height:260px;">
+                                    <canvas id="chart-iter-{{ loop.index }}-tsr" data-iteration="{{ loop.index }}" class="w-full h-64" style="min-height:260px; max-height:360px;"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white p-3 rounded shadow">
+                                <h5 class="text-sm font-medium text-gray-700 mb-2">{{ L.overall_latency }}</h5>
+                                <div style="min-height:260px;">
+                                    <canvas id="chart-iter-{{ loop.index }}-latency" data-iteration="{{ loop.index }}" class="w-full h-64" style="min-height:260px; max-height:360px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 overflow-x-auto">
+                        <h4 class="text-md font-medium mb-2">{{ L.tasks_in_iteration }}</h4>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.task_id }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.query }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.level }}</th>
+                                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.exec_time }}</th>
+                                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.overall_score_col }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for t in iteration.tasks %}
+                                        <tr>
+                                            <td class="px-3 py-2 text-sm text-gray-700" style="min-width:120px">{{ t.task_id }}</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700 text-ellipsis" style="max-width:36rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ t.query }}</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700">{{ t.level }}</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700 text-right">{{ "%.2f"|format(t.execution_time) }}</td>
+                                            <td class="px-3 py-2 text-sm text-gray-700 text-right">{{ "%.2f"|format(t.evaluation_results.get('overall_orchestration_score', t.evaluation_results.get('overall_score', 0)) if t.evaluation_results else 0) }}</td>
+                                        </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="task-details" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">{{ L.task_details }}</h2>
+            <div class="bg-white shadow rounded-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.task_id }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.status }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.failure_reason }}</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.execution_time_col }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.query }}</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ L.action }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for task in tasks %}
+                        {% set pass_flag = task.evaluation_results.get('task_success_passed') if task.evaluation_results else False %}
+                        {% if not pass_flag %}
+                            {% set tsr_value = (task.evaluation_results.get('task_success_rate', 0) if task.evaluation_results else 0) %}
+                            {% if tsr_value is not none and tsr_value|float >= 1 %}
+                                {% set pass_flag = true %}
+                            {% endif %}
+                        {% endif %}
+                        <tr data-iteration="{{ task.iteration if task.iteration is defined else 'all' }}" data-task-id="{{ task.id or task.task_id or task.task_id }}">
+                            <td class="px-4 py-2 text-sm text-gray-700">{{ task.id or task.task_id or task.task_id }}</td>
+                            <td class="px-4 py-2 text-sm">
+                                {% if pass_flag %}
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">{{ L.pass_text }}</span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">{{ L.fail_text }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-2 text-sm text-gray-700">{{ task.failure_reason or "-" }}</td>
+                            <td class="px-4 py-2 text-sm text-gray-700 text-right">{{ "%.2f"|format(task.execution_time) }}s</td>
+                            <td class="px-4 py-2 text-sm text-gray-700 text-ellipsis" style="max-width:36rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ task.query or '' }}</td>
+                            <td class="px-4 py-2 text-sm text-right">
+                                <button class="details-toggle inline-flex items-center px-3 py-1 border border-gray-300 rounded text-sm bg-white hover:bg-gray-50" data-target="details-{{ task.safe_task_id }}">{{ L.details }}</button>
+                            </td>
+                        </tr>
+                        <tr class="details-row hidden bg-gray-50" id="details-{{ task.safe_task_id }}">
+                            <td colspan="6" class="px-4 py-3 text-sm text-gray-700">
+                                {% set er = task.evaluation_results or {} %}
+                                {% set key_scores = task.key_scores if task.key_scores is defined else None %}
+                                <div class="mb-3">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        {% if key_scores %}
+                                            {% set ordered_keys = ['overall_orchestration_score','overall_score','task_success_rate','task_complete_rate','execution_efficiency'] %}
+                                            {% for m in ordered_keys %}
+                                                {% if key_scores.get(m) is not none %}
+                                                    {% set v = key_scores.get(m) | float %}
+                                                    {% set normalized = m in ['overall_orchestration_score','overall_score','task_success_rate','task_complete_rate','execution_efficiency'] %}
+                                                    {% if normalized %}
+                                                        {% if v >= 0.75 %}
+                                                            {% set bg = 'bg-emerald-100' %}
+                                                            {% set text = 'text-emerald-800' %}
+                                                        {% elif v >= 0.5 %}
+                                                            {% set bg = 'bg-yellow-100' %}
+                                                            {% set text = 'text-yellow-800' %}
+                                                        {% elif v >= 0.25 %}
+                                                            {% set bg = 'bg-orange-100' %}
+                                                            {% set text = 'text-orange-800' %}
+                                                        {% else %}
+                                                            {% set bg = 'bg-red-100' %}
+                                                            {% set text = 'text-red-800' %}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% set bg = 'bg-slate-100' %}
+                                                        {% set text = 'text-slate-800' %}
+                                                    {% endif %}
+                                                    {% set display = namespace(value = ("%.2f"|format(v))) %}
+                                                    {% if normalized %}
+                                                        {% set display.value = ("%.1f%%"|format(v * 100)) %}
+                                                    {% endif %}
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ bg }} {{ text }}">
+                                                        <span class="mr-2">{{ m.replace('_',' ').replace('score','').strip().title() }}</span>
+                                                        <span class="ml-1">{{ display.value }}</span>
+                                                    </span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for m in ['task_complete_rate','execution_efficiency','task_success_rate','overall_orchestration_score','overall_score'] %}
+                                                {% set v = (er.get(m, 0) if er is not none else 0) | float %}
+                                                {% if v >= 0.75 %}
+                                                    {% set bg = 'bg-emerald-100' %}
+                                                    {% set text = 'text-emerald-800' %}
+                                                {% elif v >= 0.5 %}
+                                                    {% set bg = 'bg-yellow-100' %}
+                                                    {% set text = 'text-yellow-800' %}
+                                                {% elif v >= 0.25 %}
+                                                    {% set bg = 'bg-orange-100' %}
+                                                    {% set text = 'text-orange-800' %}
+                                                {% else %}
+                                                    {% set bg = 'bg-red-100' %}
+                                                    {% set text = 'text-red-800' %}
+                                                {% endif %}
+                                                {% set display_val = ("%.2f"|format(v)) %}
+                                                {% if m in ['task_complete_rate','execution_efficiency','task_success_rate','overall_orchestration_score','overall_score'] %}
+                                                    {% set display_val = ("%.1f%%"|format(v * 100)) %}
+                                                {% endif %}
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ bg }} {{ text }}">
+                                                    <span class="mr-2">{{ m.replace('_',' ').replace('score','').strip().title() }}</span>
+                                                    <span class="ml-1">{{ display_val }}</span>
+                                                </span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="final-output" data-iteration="{{ task.iteration if task.iteration is defined else 'all' }}">
+                                    <pre class="final-output-raw" style="display:none">{{ task.final_output }}</pre>
+                                    <div class="final-output-render prose max-w-none"></div>
+                                </div>
+                                <div class="mt-4">
+                                    <h5 class="text-sm font-medium mb-2">{{ L.conversation_log }}</h5>
+                                    {% set convo = task.conversation_history or [] %}
+                                    {% if convo %}
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <div class="inline-flex rounded-md shadow-sm" role="group" aria-label="role-filter">
+                                                <button type="button" class="role-filter-btn px-3 py-1 bg-white border border-gray-300 text-sm" data-target="convo-{{ task.safe_task_id }}" data-role="all">All</button>
+                                                <button type="button" class="role-filter-btn px-3 py-1 bg-white border-t border-b border-gray-300 text-sm" data-target="convo-{{ task.safe_task_id }}" data-role="assistant">Assistant</button>
+                                                <button type="button" class="role-filter-btn px-3 py-1 bg-white border border-gray-300 text-sm" data-target="convo-{{ task.safe_task_id }}" data-role="user">User</button>
+                                                <button type="button" class="role-filter-btn px-3 py-1 bg-white border border-gray-300 text-sm" data-target="convo-{{ task.safe_task_id }}" data-role="system">System</button>
+                                            </div>
+                                            <div class="ml-2 flex-1">
+                                                <input type="search" placeholder="{{ L.search_placeholder }}" class="convo-search w-full px-2 py-1 border border-gray-300 rounded text-sm" data-target="convo-{{ task.safe_task_id }}" />
+                                            </div>
+                                        </div>
+                                        <div id="convo-{{ task.safe_task_id }}" class="bg-gray-100 rounded p-3 text-sm text-gray-800" style="max-height:320px; overflow:auto;">
+                                            <ol class="list-decimal pl-5 space-y-2 convo-list">
+                                            {% for msg in convo %}
+                                                {% set role_low = (msg.role or 'unknown')|lower %}
+                                                <li data-role="{{ role_low }}" class="convo-item p-2 rounded {{ 'bg-emerald-50 border-l-4 border-emerald-400' if role_low == 'assistant' else ('bg-blue-50 border-l-4 border-blue-400' if role_low == 'user' else ('bg-red-50 border-l-4 border-red-400' if role_low == 'system' else 'bg-gray-50 border-l-4 border-gray-300')) }}">
+                                                    <div class="text-xs text-gray-500">{{ (msg.timestamp or '') }}</div>
+                                                    <div><strong class="capitalize">{{ (msg.role or 'unknown') }}</strong> <span class="text-gray-600">({{ msg.type or '' }})</span></div>
+                                                    <div class="mt-1 font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">{{ msg.content }}</div>
+                                                </li>
+                                            {% endfor %}
+                                            </ol>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button class="copy-convo inline-flex items-center px-3 py-1 border border-gray-300 rounded text-sm bg-white hover:bg-gray-50" data-target="convo-json-{{ task.safe_task_id }}">{{ L.copy_json }}</button>
+                                            <button class="toggle-convo-json inline-flex items-center px-3 py-1 border border-gray-300 rounded text-sm bg-white hover:bg-gray-50 ml-2" data-target="convo-json-{{ task.safe_task_id }}">{{ L.show_json }}</button>
+                                        </div>
+                                        <pre id="convo-json-{{ task.safe_task_id }}" class="convo-json mt-2 bg-gray-900 text-green-200 p-3 rounded text-xs" style="display:none; white-space:pre-wrap; max-height:320px; overflow:auto">{{ task.conversation_history_json if task.conversation_history_json is defined else task.conversation_history }}</pre>
+                                    {% else %}
+                                        <div class="text-sm text-gray-500">{{ L.no_conversation }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-3">
+                                    <h5 class="text-sm font-medium mb-2">{{ L.validation_checks }}</h5>
+                                    <div class="text-sm text-gray-700">
+                                        {% set checks = er.get('task_success_rule_checks', []) %}
+                                        {% if checks %}
+                                            <ul class="list-disc pl-5">
+                                            {% for rc in checks %}
+                                                <li>
+                                                    <strong>{{ rc.rule }}</strong> -
+                                                    {% if rc.matched %}
+                                                        <span class="text-emerald-700 font-medium">PASS</span>
+                                                    {% else %}
+                                                        <span class="text-red-700 font-medium">FAIL</span>
+                                                    {% endif %}
+                                                    {% if rc.reason %}<span class="text-gray-500"> ({{ rc.reason }})</span>{% endif %}
+                                                </li>
+                                            {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <div class="text-sm text-gray-500">{{ L.no_validation }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% set frs = er.get('final_output_rule_scores', []) %}
+                                    {% if frs %}
+                                        <h6 class="text-sm font-medium mt-3">{{ L.final_output_rule_scores }}</h6>
+                                        <div class="text-sm text-gray-700">
+                                            <ul class="list-decimal pl-5">
+                                            {% for rs in frs %}
+                                                <li>{{ rs.rule }}: <strong>{{ (rs.score * 100) | round(1) }}%</strong></li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Inject chart data for the static report.js to consume -->
+    <script>
+        window.__REPORT_CHARTS__ = {{ charts_json | safe }};
+    </script>
+    <script>
+        // Small helpers for conversation JSON toggle and copy buttons
+        (function(){
+            var L_STR = {
+                show_json: '{{ L.show_json }}',
+                hide_json: '{{ L.hide_json }}',
+                copy_json: '{{ L.copy_json }}',
+                copied: '{{ L.copied }}'
+            };
+            function copyText(text){
+                try{
+                    if(navigator && navigator.clipboard && navigator.clipboard.writeText){
+                        navigator.clipboard.writeText(text);
+                        return true;
+                    }
+                }catch(e){}
+                // fallback: create textarea
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                try{ document.execCommand('copy'); }catch(e){}
+                document.body.removeChild(ta);
+                return true;
+            }
+
+            document.addEventListener('click', function(e){
+                var t = e.target;
+                if(t.classList && t.classList.contains('toggle-convo-json')){
+                    var id = t.getAttribute('data-target');
+                    var el = document.getElementById(id);
+                    if(!el) return;
+                    el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+                        t.textContent = (el.style.display === 'none') ? L_STR.show_json : L_STR.hide_json;
+                }
+                if(t.classList && t.classList.contains('copy-convo')){
+                    var id = t.getAttribute('data-target');
+                    var el = document.getElementById(id);
+                    if(!el) return;
+                    copyText(el.textContent || el.innerText || '');
+                        t.textContent = L_STR.copied;
+                        setTimeout(function(){ t.textContent = L_STR.copy_json; }, 1200);
+                }
+                // role filter buttons
+                if(t.classList && t.classList.contains('role-filter-btn')){
+                    var target = t.getAttribute('data-target');
+                    var role = t.getAttribute('data-role');
+                    var container = document.getElementById(target);
+                    if(!container) return;
+                    var items = container.querySelectorAll('.convo-item');
+                    items.forEach(function(it){
+                        if(role === 'all'){
+                            it.style.display = '';
+                        } else {
+                            if(it.getAttribute('data-role') === role){
+                                it.style.display = '';
+                            } else {
+                                it.style.display = 'none';
+                            }
+                        }
+                    });
+                    return;
+                }
+            }, false);
+
+            // search (input) handling
+            document.addEventListener('input', function(e){
+                var t = e.target;
+                if(t.classList && t.classList.contains('convo-search')){
+                    var q = (t.value || '').toLowerCase().trim();
+                    var target = t.getAttribute('data-target');
+                    var container = document.getElementById(target);
+                    if(!container) return;
+                    var items = container.querySelectorAll('.convo-item');
+                    items.forEach(function(it){
+                        var txt = (it.innerText || it.textContent || '').toLowerCase();
+                        if(!q){
+                            it.style.display = '';
+                        } else {
+                            if(txt.indexOf(q) !== -1){
+                                it.style.display = '';
+                            } else {
+                                it.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            }, false);
+        })();
+    </script>
+    <script src="./static/report.js"></script>
+</body>
+</html>

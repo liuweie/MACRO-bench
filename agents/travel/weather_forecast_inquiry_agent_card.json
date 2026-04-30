@@ -1,0 +1,59 @@
+{
+  "name": "weather forecast inquiry Agent",
+  "description": "inquiry weather forecast according to the date and city",
+  "url": "http://10.110.130.149:24103/7570923342585724937/a2a/",
+  "provider": {
+    "organization": "coze",
+    "url": ""
+  },
+  "version": "1.0.0",
+  "documentationUrl": "",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {
+    "customized": {
+      "type": "openIdConnect",
+      "openIdConnectUrl": ""
+    }
+  },
+  "security": [
+    {
+      "customized": [
+        "openid",
+        "profile",
+        "email"
+      ]
+    }
+  ],
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "image/png"
+  ],
+  "skills": [
+    {
+      "id": "1972965398500290561",
+      "name": "search the weather forecast",
+      "description": "Search for weather forecasts based on the user's input city and exact date.",
+      "tags": [],
+      "examples": [
+        "Check the weather in Beijing on November 1, 2025."
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "image/png"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": true
+}

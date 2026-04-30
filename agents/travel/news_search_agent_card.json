@@ -1,0 +1,59 @@
+{
+  "name": "News Search Agent",
+  "description": "A  news search agent capable of searching for relevant news content.",
+  "url": "http://10.110.130.149:24103/7570925684181450798/a2a/",
+  "provider": {
+    "organization": "coze",
+    "url": ""
+  },
+  "version": "1.0.0",
+  "documentationUrl": "",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {
+    "customized": {
+      "type": "openIdConnect",
+      "openIdConnectUrl": ""
+    }
+  },
+  "security": [
+    {
+      "customized": [
+        "openid",
+        "profile",
+        "email"
+      ]
+    }
+  ],
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "image/png"
+  ],
+  "skills": [
+    {
+      "id": "1972965398500290561",
+      "name": "Search news",
+      "description": "When a user enters a news headline, use this tool to search for news content related to that headline.",
+      "tags": [],
+      "examples": [
+        "Check the latest NBA news"
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json",
+        "image/png"
+      ]
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": true
+}

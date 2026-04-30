@@ -1,0 +1,13 @@
+__pycache__
+node_modules
+logs/*
+reports/*
+models
+critic
+staticfiles
+trajectories
+.env
+*.log
+test_llm.py
+output/*
+benchmark_logs.jsonl

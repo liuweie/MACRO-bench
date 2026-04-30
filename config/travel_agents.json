@@ -1,0 +1,24 @@
+{
+  "cn":
+    {
+      "flight_search": "flight search agent - 搜索航班信息和机票。",
+      "hotel_recommendation": "hotel accommodation recommendation agent - 推荐住宿（含酒店/民宿/短租）信息。",
+      "movie_recommendation": "movie recommendation agent - 电影推荐智能体，基于用户兴趣推荐正在上映电影。",
+      "news_search": "news search agent - 新闻检索智能体，搜索与关键词相关的新闻内容。",
+      "restaurant_recommendation": "restaurant recommendation agent - 餐厅推荐智能体，基于地点与口味推荐餐厅。",
+      "itinerary_planning": " Itinerary Planning Agent - 日程规划智能体，擅长生成行程计划、交通与景点建议。",
+      "weather_forecast_check": "weather forecast check agent - 天气预报查询智能体，按地点与日期返回天气信息。",
+      "chat_agent": "chat agent - 聊天智能体，支持多轮对话、澄清问题与对话式帮助。"
+    },
+  "en":
+    {
+      "flight_search": "flight search agent - Search for flight information and tickets.",
+      "hotel_recommendation": "hotel accommodation recommendation agent - Recommend accommodation information (including hotels, B&Bs, and short-term rentals).",
+      "movie_recommendation": "movie recommendation agent - Movie recommendation agent, recommends currently showing movies based on user interests.",
+      "news_search": "news search agent - News search agent, searches for news content related to keywords.",
+      "restaurant_recommendation": "restaurant recommendation agent - Restaurant recommendation agent, recommends restaurants based on location and taste.",
+      "itinerary_planning": "Itinerary Planning Agent - Plan structured multi-day travel itineraries with clear daily and time-based schedules",
+      "weather_forecast_inquiry": "inquiry weather forecast according to the date and city.",
+      "chat_agent": "chat agent - Conversational chat agent for open dialogue, multi-turn clarification and conversational assistance."
+    }
+}

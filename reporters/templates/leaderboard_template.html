@@ -1,0 +1,2127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Multi-Agent Orchestrator Leaderboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* High-tech AI theme */
+    :root{ --bg-from:#0f172a; --bg-to:#1f1144; --card-bg:rgba(255,255,255,0.04); --card-border:rgba(124,58,237,0.12); --accent:#ff6ea1; }
+    body{ background: linear-gradient(135deg,var(--bg-from),var(--bg-to)); color: white; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid var(--card-border); border-radius: .75rem; }
+    .muted { color: rgba(255,255,255,0.7); }
+    .accent { color: var(--accent); }
+    .btn-accent { background: linear-gradient(90deg,#ff6ea1,#7c3aed); color: white; }
+    .metric-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(124,58,237,0.1);
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 56px;
+    }
+    .metric-card .level { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .metric-card .count { font-size: 1.45rem; font-weight: 800; color: #fff; }
+    .metric-card .avg { font-size: 0.9rem; color: rgba(255,255,255,0.9); }
+    .metric-card .mini-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.04); border-radius: 6px; overflow: hidden; margin-top: 6px; }
+    .metric-card .mini-bar > i { display: block; height: 100%; background: linear-gradient(90deg,#10b981,#3b82f6); border-radius: 6px; }
+    .domain-section { scroll-margin-top: 2rem; }
+    
+    /* 精简后的样式 */
+    .radar-container {
+      position: relative;
+      height: 360px;
+    }
+    .radar-label-tooltip {
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      max-width: 320px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      z-index: 60;
+      pointer-events: none;
+      line-height: 1.2;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .summary-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(124,58,237,0.1);
+      border-radius: 0.5rem;
+      padding: 0.6rem; /* tighter spacing for compact layout */
+    }
+    .summary-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1.1;
+    }
+    .summary-label {
+      font-size: 0.70rem;
+      color: rgba(255,255,255,0.75);
+      margin-top: 0.15rem;
+    }
+    .score-distribution {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.75rem;
+    }
+    .score-bar {
+      height: 4px;
+      border-radius: 2px;
+      margin-top: 0.25rem;
+    }
+    .performance-tag {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .performance-excellent {
+      background: rgba(16, 185, 129, 0.2);
+      color: rgb(16, 185, 129);
+    }
+    .performance-good {
+      background: rgba(59, 130, 246, 0.2);
+      color: rgb(59, 130, 246);
+    }
+    .performance-average {
+      background: rgba(245, 158, 11, 0.2);
+      color: rgb(245, 158, 11);
+    }
+    .performance-poor {
+      background: rgba(239, 68, 68, 0.2);
+      color: rgb(239, 68, 68);
+    }
+    .subdued-btn {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    .subdued-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.9);
+    }
+    .orchestrator-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Header -->
+  <header class="border-b border-gray-700 sticky top-0 bg-slate-900/80 backdrop-blur-sm z-40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-gradient-to-r from-pink-500 to-violet-600 rounded-lg flex items-center justify-center">
+          <i class="fas fa-robot text-white text-sm"></i>
+        </div>
+        <div>
+          <div class="text-lg font-semibold text-white">Multi-Agent Orchestrator</div>
+          <div class="text-xs muted">Benchmark Leaderboard</div>
+        </div>
+      </div>
+      <nav class="flex items-center gap-4">
+        <button id="btn-open-eval" class="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white transition-all">Run Evaluation</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Hero Section -->
+    <section class="mb-8">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent mb-4">Multi-Agent Orchestrator Leaderboard</h1>
+        <p class="text-lg muted max-w-3xl mx-auto">Compare performance across different domains, orchestrators, and LLM models with detailed metrics analysis</p>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-3 gap-6 mb-6">
+        <div class="card p-6 text-center">
+          <div class="text-2xl font-bold text-white">{{ total_evaluations }}</div>
+          <div class="text-sm muted mt-2">Total Evaluations</div>
+        </div>
+        <div class="card p-6 text-center">
+          <div class="text-2xl font-bold text-white">{{ active_domains }}</div>
+          <div class="text-sm muted mt-2">Active Domains</div>
+        </div>
+        <div class="card p-6 text-center">
+          <div class="text-2xl font-bold text-white">{{ top_score|floatformat:2 }}</div>
+          <div class="text-sm muted mt-2">Top Score</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest Evaluator Analysis -->
+    {% if latest_evaluator_summary or latest_evaluator_metrics %}
+    <section class="card p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold text-white">Latest Evaluation Results</h2>
+        <div class="flex items-center gap-2">
+          {% if top_entry %}
+            <a href="{% url 'campaign_detail' top_entry.campaign.id %}" class="subdued-btn">View details</a>
+            {% if latest_results_summary_url %}
+              <a href="{{ latest_results_summary_url }}" class="subdued-btn" target="_blank" rel="noopener">Download Summary</a>
+            {% endif %}
+            {% if latest_results_detailed_url %}
+              <a href="{{ latest_results_detailed_url }}" class="subdued-btn" target="_blank" rel="noopener">Download Detailed</a>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'upload' %}" class="subdued-btn">View details</a>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Radar Chart -->
+        <div class="w-full lg:w-1/2">
+          <div class="card p-4 h-full">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-medium text-white">Performance Radar</h3>
+              <div class="flex items-center gap-2 text-sm">
+                <div class="flex items-center gap-1">
+                  <div class="w-3 h-3 rounded-full bg-pink-500"></div>
+                  <span class="text-xs muted">Latest</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <div class="w-3 h-3 rounded-full bg-violet-500"></div>
+                  <span class="text-xs muted">SOTA</span>
+                </div>
+              </div>
+            </div>
+            <div class="radar-container">
+              <canvas id="evaluatorRadar"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary & Details -->
+        <div class="w-full lg:w-1/2">
+          <div class="card p-4 h-full">
+            <!-- Orchestrator Info -->
+            <div class="mb-4">
+              <div class="text-sm font-medium text-white mb-2">Evaluated Orchestrator</div>
+              <div class="orchestrator-badge">
+                  <div class="w-6 h-6 bg-gradient-to-r from-pink-500 to-violet-600 rounded flex items-center justify-center text-white text-xs font-bold">
+                    {{ latest_evaluator_summary.orchestrator|slice:":2"|default:"OR"|upper }}
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                      <div id="evaluator-orchestrator" class="text-white font-medium">{{ latest_evaluator_summary.orchestrator|default:"Unknown Orchestrator" }}</div>
+                      <div id="evaluator-total-traces-inline" class="text-xs muted">{{ latest_evaluator_summary.total_traces|default:'-' }}</div>
+                    </div>
+                    <div id="evaluator-llm" class="text-xs muted">{{ latest_evaluator_summary.llm_model|default:"Unknown LLM" }}</div>
+                  </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics Grid -->
+              <div class="summary-grid">
+              <div class="summary-card">
+                <!-- Success rate -->
+                <div id="evaluator-success-rate" class="summary-value">-</div>
+                <div class="summary-label">Success Rate</div>
+              </div>
+              <div class="summary-card">
+                <!-- Milestone completion rate -->
+                <div id="evaluator-milestone-rate" class="summary-value">-</div>
+                <div class="summary-label">Milestone Rate</div>
+              </div>
+              <div class="summary-card">
+                <!-- Orchestration efficiency -->
+                <div id="evaluator-orch-eff" class="summary-value">-</div>
+                <div class="summary-label">Orch. Efficiency</div>
+              </div>
+              <div class="summary-card">
+                <!-- Orchestration latency seconds -->
+                <div id="evaluator-orch-latency" class="summary-value">-</div>
+                <div class="summary-label">Orch. Latency</div>
+              </div>
+              <!-- Replaced Total Time & Evaluator Type with Task Level Breakdown summary -->
+              <div class="summary-card" style="grid-column: 1 / -1;">
+                <div class="text-sm font-medium text-white mb-3">Task Distribution</div>
+                <div id="task-level-breakdown" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem;">
+                  {# Rendered by JS from `latest_evaluator_summary` JSON for consistent formatting #}
+                </div>
+              </div>
+            </div>
+
+            <!-- Performance Overview -->
+            <div class="summary-card">
+              <div class="text-sm font-medium text-white mb-3">Performance Overview</div>
+              <div class="score-distribution">
+                <div class="text-center">
+                  <div class="text-xs muted mb-1">Excellent</div>
+                  <div id="dist-good" class="text-sm font-semibold">{{ latest_evaluator_summary.distribution.good|default:0 }}</div>
+                  <div class="score-bar w-8 bg-green-500"></div>
+                </div>
+                <div class="text-center">
+                  <div class="text-xs muted mb-1">Good</div>
+                  <div id="dist-fair" class="text-sm font-semibold">{{ latest_evaluator_summary.distribution.fair|default:0 }}</div>
+                  <div class="score-bar w-8 bg-blue-500"></div>
+                </div>
+                <div class="text-center">
+                  <div class="text-xs muted mb-1">Average</div>
+                  <div id="dist-medium" class="text-sm font-semibold">{{ latest_evaluator_summary.distribution.medium|default:0 }}</div>
+                  <div class="score-bar w-8 bg-yellow-500"></div>
+                </div>
+                <div class="text-center">
+                  <div class="text-xs muted mb-1">Poor</div>
+                  <div id="dist-poor" class="text-sm font-semibold">{{ latest_evaluator_summary.distribution.poor|default:0 }}</div>
+                  <div class="score-bar w-8 bg-red-500"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% else %}
+    <section class="card p-6 mb-8">
+      <div class="text-center py-8">
+        <div class="text-4xl mb-4">📊</div>
+        <h3 class="text-xl font-medium text-white mb-2">No Evaluation Results Yet</h3>
+        <p class="text-sm muted max-w-md mx-auto">Use the "Run Evaluation" button to start an evaluation. Results and performance analysis will appear here after completion.</p>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Domain Leaderboards -->
+    <div id="domains-container">
+      <!-- Travel Domain (Default First) -->
+      <section class="domain-section card p-6 mb-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-white flex items-center gap-3">
+              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+              Travel Domain
+            </h2>
+            <p class="muted mt-2">Performance comparison of orchestrators in travel-related tasks</p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+            </select>
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>Qwen-235B</option>
+              <option>GPT-4</option>
+              <option>GPT-3.5</option>
+              <option>Claude 3</option>
+              <option>Llama</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Competitor Comparison Chart -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-white mb-4">Competitor Comparison</h3>
+          <div class="card p-4">
+            <div class="h-80">
+              <canvas id="travelChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-white">Performance Rankings</h3>
+            <div class="text-sm muted">{{ travel_competitors|length }} competitors</div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-700">
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Rank</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestrator</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">LLM</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Overall</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Business</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestration</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Efficiency</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Performance</th>
+                </tr>
+              </thead>
+              <tbody id="travel-table-body">
+                {% for entry in travel_competitors|slice:":5" %}
+                <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <span class="font-medium">#{{ forloop.counter }}</span>
+                      {% if forloop.counter <= 3 %}
+                      <span class="ml-2">
+                        {% if forloop.counter == 1 %}🥇
+                        {% elif forloop.counter == 2 %}🥈
+                        {% else %}🥉{% endif %}
+                      </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-gradient-to-r from-pink-500 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mr-3">
+                        {{ entry.orchestrator|slice:":2"|upper }}
+                      </div>
+                      <div class="font-medium text-white">
+                        <a href="{% url 'campaign_detail' entry.campaign.id %}" class="text-white hover:underline">{{ entry.orchestrator }}</a>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.llm }}</td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="text-lg font-bold text-white mr-3">{{ entry.overall|floatformat:2 }}</div>
+                      <div class="w-16 bg-gray-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: {{ entry.overall_percent }}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.business|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.orchestration|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.efficiency|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.performance|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+            {% if travel_competitors|length > 5 %}
+            <div class="text-center mt-4">
+              <button id="travel-show-more" class="text-sm text-violet-400 hover:text-violet-300 transition-colors">
+                Show All {{ travel_competitors|length }} Competitors
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <!-- HR Domain -->
+      <section class="domain-section card p-6 mb-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-white flex items-center gap-3">
+              <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+              HR Domain 
+            </h2>
+            <p class="muted mt-2">Performance comparison of orchestrators in HR-related tasks</p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+            </select>
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>All LLMs</option>
+              <option>GPT-4</option>
+              <option>GPT-3.5</option>
+              <option>Claude 3</option>
+              <option>Qwen</option>
+              <option>Llama</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Competitor Comparison Chart -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-white mb-4">Competitor Comparison</h3>
+          <div class="card p-4">
+            <div class="h-80">
+              <canvas id="hrChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-white">Performance Rankings</h3>
+            <div class="text-sm muted">{{ hr_competitors|length }} competitors</div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-700">
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Rank</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestrator</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">LLM</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Overall</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Business</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestration</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Efficiency</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Performance</th>
+                </tr>
+              </thead>
+              <tbody id="hr-table-body">
+                {% for entry in hr_competitors|slice:":5" %}
+                <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <span class="font-medium">#{{ forloop.counter }}</span>
+                      {% if forloop.counter <= 3 %}
+                      <span class="ml-2">
+                        {% if forloop.counter == 1 %}🥇
+                        {% elif forloop.counter == 2 %}🥈
+                        {% else %}🥉{% endif %}
+                      </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mr-3">
+                        {{ entry.orchestrator|slice:":2"|upper }}
+                      </div>
+                      <div class="font-medium text-white">{{ entry.orchestrator }}</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.llm }}</td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="text-lg font-bold text-white mr-3">{{ entry.overall|floatformat:2 }}</div>
+                      <div class="w-16 bg-gray-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: {{ entry.overall_percent }}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.business|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.orchestration|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.efficiency|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.performance|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+            {% if hr_competitors|length > 5 %}
+            <div class="text-center mt-4">
+              <button id="hr-show-more" class="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                Show All {{ hr_competitors|length }} Competitors
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <!-- IT Domain -->
+      <section class="domain-section card p-6 mb-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-white flex items-center gap-3">
+              <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+              IT Domain 
+            </h2>
+            <p class="muted mt-2">Performance comparison of orchestrators in IT-related tasks</p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+            </select>
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>All LLMs</option>
+              <option>GPT-4</option>
+              <option>GPT-3.5</option>
+              <option>Claude 3</option>
+              <option>Qwen</option>
+              <option>Llama</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Competitor Comparison Chart -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-white mb-4">Competitor Comparison</h3>
+          <div class="card p-4">
+            <div class="h-80">
+              <canvas id="itChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-white">Performance Rankings</h3>
+            <div class="text-sm muted">{{ it_competitors|length }} competitors</div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-700">
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Rank</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestrator</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">LLM</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Overall</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Business</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestration</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Efficiency</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Performance</th>
+                </tr>
+              </thead>
+              <tbody id="it-table-body">
+                {% for entry in it_competitors|slice:":5" %}
+                <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <span class="font-medium">#{{ forloop.counter }}</span>
+                      {% if forloop.counter <= 3 %}
+                      <span class="ml-2">
+                        {% if forloop.counter == 1 %}🥇
+                        {% elif forloop.counter == 2 %}🥈
+                        {% else %}🥉{% endif %}
+                      </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mr-3">
+                        {{ entry.orchestrator|slice:":2"|upper }}
+                      </div>
+                      <div class="font-medium text-white">{{ entry.orchestrator }}</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.llm }}</td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="text-lg font-bold text-white mr-3">{{ entry.overall|floatformat:2 }}</div>
+                      <div class="w-16 bg-gray-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: {{ entry.overall_percent }}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.business|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.orchestration|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.efficiency|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.performance|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+            {% if it_competitors|length > 5 %}
+            <div class="text-center mt-4">
+              <button id="it-show-more" class="text-sm text-purple-400 hover:text-purple-300 transition-colors">
+                Show All {{ it_competitors|length }} Competitors
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <!-- CRM Domain -->
+      <section class="domain-section card p-6 mb-8">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-white flex items-center gap-3">
+              <span class="w-3 h-3 bg-orange-500 rounded-full"></span>
+              CRM Domain 
+            </h2>
+            <p class="muted mt-2">Performance comparison of orchestrators in CRM-related tasks</p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last 90 days</option>
+            </select>
+            <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm">
+              <option>All LLMs</option>
+              <option>GPT-4</option>
+              <option>GPT-3.5</option>
+              <option>Claude 3</option>
+              <option>Qwen</option>
+              <option>Llama</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Competitor Comparison Chart -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-white mb-4">Competitor Comparison</h3>
+          <div class="card p-4">
+            <div class="h-80">
+              <canvas id="crmChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-white">Performance Rankings</h3>
+            <div class="text-sm muted">{{ crm_competitors|length }} competitors</div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-700">
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Rank</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestrator</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">LLM</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Overall</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Business</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Orchestration</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Efficiency</th>
+                  <th class="text-left py-3 px-4 text-sm muted font-medium">Performance</th>
+                </tr>
+              </thead>
+              <tbody id="crm-table-body">
+                {% for entry in crm_competitors|slice:":5" %}
+                <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <span class="font-medium">#{{ forloop.counter }}</span>
+                      {% if forloop.counter <= 3 %}
+                      <span class="ml-2">
+                        {% if forloop.counter == 1 %}🥇
+                        {% elif forloop.counter == 2 %}🥈
+                        {% else %}🥉{% endif %}
+                      </span>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mr-3">
+                        {{ entry.orchestrator|slice:":2"|upper }}
+                      </div>
+                      <div class="font-medium text-white">{{ entry.orchestrator }}</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.llm }}</td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="text-lg font-bold text-white mr-3">{{ entry.overall|floatformat:2 }}</div>
+                      <div class="w-16 bg-gray-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: {{ entry.overall_percent }}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">{{ entry.business|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.orchestration|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.efficiency|floatformat:2 }}</td>
+                  <td class="py-4 px-4 text-sm">{{ entry.performance|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+            {% if crm_competitors|length > 5 %}
+            <div class="text-center mt-4">
+              <button id="crm-show-more" class="text-sm text-orange-400 hover:text-orange-300 transition-colors">
+                Show All {{ crm_competitors|length }} Competitors
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Evaluation Modal -->
+  <div id="eval-modal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+    <div id="eval-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm" tabindex="-1"></div>
+    <div class="relative max-w-3xl w-full mx-auto">
+      <div class="card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-white">Run Evaluation</h3>
+          <button id="eval-close" class="text-gray-300 hover:text-white">✕</button>
+        </div>
+        <form id="eval-form" class="space-y-4" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">Trace file</label>
+              <input id="modal-file" name="trace_file" type="file" accept=".jsonl,.json" class="w-full text-sm bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white" />
+            </div>
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">Orchestrator name</label>
+              <select id="modal-orch" name="orchestrator" class="w-full border border-gray-700 rounded px-3 py-2 text-white bg-gray-800">
+                <option value="">Select Orchestrator</option>
+                {% for o in available_orchestrators %}
+                <option value="{{ o.name }}">{{ o.display_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">Domain</label>
+              <select name="domain" class="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-white">
+                <option value="">Select Domain</option>
+                {% for d in available_domains %}
+                <option value="{{ d.name }}">{{ d.display_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">LLM Model</label>
+              <select name="llm_model" class="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-white">
+                <option value="">Select LLM</option>
+                {% for lm in available_llm_models %}
+                <option value="{{ lm.name }}">{{ lm.provider }} / {{ lm.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">Evaluator type</label>
+              <select id="modal-evaltype" name="evaluator_type" class="w-full border border-gray-700 rounded px-3 py-2 bg-gray-800 text-white">
+                <option value="rule_based">Rule Based</option>
+                <option value="llm_enhanced">LLM Enhanced</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">Max traces</label>
+              <input id="modal-max" name="max_traces" type="number" placeholder="e.g. 200" class="w-full border border-gray-700 rounded px-3 py-2 text-white bg-gray-800" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">Task config (file)</label>
+              <input id="modal-taskcfg" name="task_config" type="file" class="w-full text-sm bg-gray-800 text-white" />
+            </div>
+            <div>
+              <label class="text-xs text-gray-300 block mb-1">Agent config (file)</label>
+              <input id="modal-agentcfg" name="agent_config" type="file" class="w-full text-sm bg-gray-800 text-white" />
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-300 block mb-1">Extra evaluator args</label>
+            <input id="modal-extra" name="extra_args" placeholder="--some-flag value --other arg" class="w-full border border-gray-700 rounded px-3 py-2 text-white bg-gray-800" />
+            <div class="text-xs text-gray-400 mt-1">Any extra flags will be appended to evaluator CLI.</div>
+          </div>
+
+          <div class="flex items-center gap-4 pt-2">
+            <label class="inline-flex items-center text-sm text-gray-300">
+              <input id="modal-verbose" type="checkbox" class="mr-2 rounded bg-gray-700 border-gray-600" /> 
+              Verbose output
+            </label>
+            <div class="flex gap-3 ml-auto">
+              <button id="modal-cancel" type="button" class="bg-gray-700 text-gray-200 px-4 py-2 rounded hover:bg-gray-600 transition-colors">Cancel</button>
+              <button id="modal-submit" type="button" class="btn-accent px-4 py-2 rounded font-medium">Run Evaluation</button>
+            </div>
+          </div>
+
+          <div id="modal-status" class="text-sm text-gray-300"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {# JSON-serialize server-side data to avoid rendering Python booleans like 'False' into JS #}
+  {{ latest_evaluator_metrics|default:"null"|json_script:"latest_evaluator_metrics" }}
+  {{ sota_metrics|default:"null"|json_script:"sota_metrics" }}
+  {{ metric_labels|default:"[]"|json_script:"metric_labels" }}
+  {{ metric_definitions|default:"{}"|json_script:"metric_definitions" }}
+  {{ metric_ranges|default:"{}"|json_script:"metric_ranges" }}
+  {{ travel_competitors|default:"[]"|json_script:"travel_competitors" }}
+  {{ hr_competitors|default:"[]"|json_script:"hr_competitors" }}
+  {{ it_competitors|default:"[]"|json_script:"it_competitors" }}
+  {{ crm_competitors|default:"[]"|json_script:"crm_competitors" }}
+  {{ latest_evaluator_detailed|default:"null"|json_script:"latest_evaluator_detailed" }}
+  {{ latest_evaluator_summary|default:"null"|json_script:"latest_evaluator_summary" }}
+  {{ latest_evaluator_command|default:"null"|json_script:"latest_evaluator_command" }}
+
+  <script>
+    // Enforce tooltip number formatting: two decimals across charts
+    try {
+        if (window.Chart && Chart.defaults && Chart.defaults.plugins && Chart.defaults.plugins.tooltip) {
+        Chart.defaults.plugins.tooltip.callbacks.label = function(context) {
+          const raw = (context.raw !== undefined) ? context.raw : (context.parsed && context.parsed.r !== undefined ? context.parsed.r : context.parsed);
+          const label = (context.dataset && context.dataset.label) ? (context.dataset.label + ': ') : '';
+          if (typeof raw === 'number') return label + raw.toFixed(2);
+          return label + String(raw);
+        };
+      }
+    } catch (e) { /* ignore if Chart not ready */ }
+    // Initialize charts for each domain
+    const initializeCharts = () => {
+      // Travel Domain Chart -> use real data from server if available
+      const travelCtx = document.getElementById('travelChart').getContext('2d');
+      (function createTravelChart(){
+        const raw = JSON.parse(document.getElementById('travel_competitors').textContent || '[]');
+        // Prefer compact set of metrics that competitor entries provide in the table
+        let labels = ['Overall','Business','Orchestration','Efficiency','Performance'];
+        const palette = ['rgba(255, 110, 161, 0.8)','rgba(124, 58, 237, 0.8)','rgba(56, 189, 248, 0.8)','rgba(16, 185, 129, 0.8)','rgba(249, 115, 22, 0.8)'];
+
+        let datasets = [];
+        if (Array.isArray(raw) && raw.length > 0) {
+          // Use top 5 competitors (or fewer)
+          raw.slice(0,5).forEach((entry, idx) => {
+            const label = entry.orchestrator || entry.name || `Competitor ${idx+1}`;
+            const d = [
+              Number(entry.overall) || 0,
+              Number(entry.business) || 0,
+              Number(entry.orchestration) || 0,
+              Number(entry.efficiency) || 0,
+              Number(entry.performance) || 0
+            ];
+            datasets.push({ label, data: d, backgroundColor: palette[idx % palette.length] });
+          });
+        } else {
+          // fallback to previous example data when no server data
+          labels = ['Task Success', 'Task Completion', 'Overall Score', 'Milestone', 'Routing', 'Response Quality', 
+                    'Context', 'Avg Rounds', 'Time Eff.', 'Clarification', 'Orchestration', 'Latency'];
+          datasets = [
+            {
+              label: 'customized',
+              data: [0.85, 0.82, 0.78, 0.75, 0.80, 0.77, 0.72, 0.68, 0.74, 0.79, 0.76, 0.71],
+              backgroundColor: 'rgba(255, 110, 161, 0.8)',
+            },
+            {
+              label: 'CrewAI',
+              data: [0.78, 0.75, 0.72, 0.70, 0.74, 0.71, 0.68, 0.65, 0.69, 0.73, 0.70, 0.67],
+              backgroundColor: 'rgba(124, 58, 237, 0.8)',
+            },
+            {
+              label: 'AutoGen',
+              data: [0.82, 0.79, 0.75, 0.73, 0.77, 0.74, 0.70, 0.67, 0.72, 0.76, 0.73, 0.69],
+              backgroundColor: 'rgba(56, 189, 248, 0.8)',
+            }
+          ];
+        }
+
+        // destroy existing chart if present
+        if (window._travelChartInstance) {
+          try { window._travelChartInstance.destroy(); } catch (e) {}
+        }
+
+        window._travelChartInstance = new Chart(travelCtx, {
+          type: 'bar',
+          data: { labels: labels, datasets: datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top', labels: { color: 'rgba(255,255,255,0.8)' } }
+            },
+            scales: {
+              y: { beginAtZero: true, max: 1.0, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)' } },
+              x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'rgba(255,255,255,0.7)', maxRotation: 45 } }
+            }
+          }
+        });
+      })();
+
+      // HR Domain Chart
+      const hrCtx = document.getElementById('hrChart').getContext('2d');
+      const hrChart = new Chart(hrCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Task Success', 'Task Completion', 'Overall Score', 'Milestone', 'Routing', 'Response Quality', 
+                   'Context', 'Avg Rounds', 'Time Eff.', 'Clarification', 'Orchestration', 'Latency'],
+          datasets: [
+            {
+              label: 'customized',
+              data: [0.82, 0.79, 0.75, 0.73, 0.77, 0.74, 0.70, 0.67, 0.72, 0.76, 0.73, 0.69],
+              backgroundColor: 'rgba(56, 189, 248, 0.8)',
+            },
+            {
+              label: 'Magentic',
+              data: [0.79, 0.76, 0.73, 0.71, 0.75, 0.72, 0.68, 0.66, 0.70, 0.74, 0.71, 0.68],
+              backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            },
+            {
+              label: 'CrewAI',
+              data: [0.76, 0.73, 0.70, 0.68, 0.72, 0.69, 0.65, 0.63, 0.67, 0.71, 0.68, 0.65],
+              backgroundColor: 'rgba(139, 92, 246, 0.8)',
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 1.0,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            },
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                maxRotation: 45
+              }
+            }
+          }
+        }
+      });
+
+      // IT Domain Chart
+      const itCtx = document.getElementById('itChart').getContext('2d');
+      const itChart = new Chart(itCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Task Success', 'Task Completion', 'Overall Score', 'Milestone', 'Routing', 'Response Quality', 
+                   'Context', 'Avg Rounds', 'Time Eff.', 'Clarification', 'Orchestration', 'Latency'],
+          datasets: [
+            {
+              label: 'Strands',
+              data: [0.88, 0.85, 0.82, 0.80, 0.84, 0.81, 0.77, 0.74, 0.79, 0.83, 0.80, 0.76],
+              backgroundColor: 'rgba(139, 92, 246, 0.8)',
+            },
+            {
+              label: 'customized',
+              data: [0.84, 0.81, 0.78, 0.76, 0.80, 0.77, 0.73, 0.70, 0.75, 0.79, 0.76, 0.72],
+              backgroundColor: 'rgba(255, 110, 161, 0.8)',
+            },
+            {
+              label: 'AutoGen',
+              data: [0.81, 0.78, 0.75, 0.73, 0.77, 0.74, 0.70, 0.68, 0.72, 0.76, 0.73, 0.70],
+              backgroundColor: 'rgba(56, 189, 248, 0.8)',
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 1.0,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            },
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                maxRotation: 45
+              }
+            }
+          }
+        }
+      });
+
+      // CRM Domain Chart
+      const crmCtx = document.getElementById('crmChart').getContext('2d');
+      const crmChart = new Chart(crmCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Task Success', 'Task Completion', 'Overall Score', 'Milestone', 'Routing', 'Response Quality', 
+                   'Context', 'Avg Rounds', 'Time Eff.', 'Clarification', 'Orchestration', 'Latency'],
+          datasets: [
+            {
+              label: 'Magentic',
+              data: [0.86, 0.83, 0.80, 0.78, 0.82, 0.79, 0.75, 0.72, 0.77, 0.81, 0.78, 0.74],
+              backgroundColor: 'rgba(249, 115, 22, 0.8)',
+            },
+            {
+              label: 'CrewAI',
+              data: [0.83, 0.80, 0.77, 0.75, 0.79, 0.76, 0.72, 0.69, 0.74, 0.78, 0.75, 0.71],
+              backgroundColor: 'rgba(139, 92, 246, 0.8)',
+            },
+            {
+              label: 'Strands',
+              data: [0.80, 0.77, 0.74, 0.72, 0.76, 0.73, 0.69, 0.67, 0.71, 0.75, 0.72, 0.69],
+              backgroundColor: 'rgba(16, 185, 129, 0.8)',
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 1.0,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            },
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                maxRotation: 45
+              }
+            }
+          }
+        }
+      });
+    };
+
+    // 初始化雷达图
+    // Normalize raw metric values to [0,1] using provided ranges.
+    function normalizeMetrics(rawArr, labels, ranges) {
+      if (!Array.isArray(labels)) return rawArr;
+      const out = new Array(labels.length).fill(0);
+      const r = ranges || {};
+      for (let i = 0; i < labels.length; i++) {
+        const label = labels[i];
+        const raw = (Array.isArray(rawArr) && rawArr.length > i) ? rawArr[i] : null;
+        const rule = r[label] || {};
+        const type = rule.type || 'ratio';
+        const max = (typeof rule.max === 'number') ? rule.max : 1.0;
+
+        let val = 0;
+        if (raw === null || raw === undefined) {
+          val = 0;
+        } else {
+          const num = Number(raw);
+          if (Number.isFinite(num)) {
+            if (type === 'ratio') {
+              val = Math.max(0, Math.min(1, num));
+            } else if (type === 'higher_better') {
+              val = Math.max(0, Math.min(1, num / max));
+            } else if (type === 'lower_better') {
+              // lower is better: map 0..max -> 1..0
+              if (max <= 0) {
+                val = 0;
+              } else {
+                val = 1 - (num / max);
+                val = Math.max(0, Math.min(1, val));
+              }
+            } else {
+              // fallback treat as ratio
+              val = Math.max(0, Math.min(1, num));
+            }
+          } else {
+            val = 0;
+          }
+        }
+        out[i] = val;
+      }
+      return out;
+    }
+    const initializeRadarChart = () => {
+      const radarEl = document.getElementById('evaluatorRadar');
+      if (!radarEl) return;
+      
+      try {
+        const latestEvalMetrics = {{ latest_evaluator_metrics|default:'null'|safe }};
+        const sotaMetrics = {{ sota_metrics|default:'null'|safe }};
+        const metricLabels = {{ metric_labels|default:"['Task Success','Completion','Orchestration','Efficiency','Response','Latency','Context','Routing','Milestone','Clarification','Rounds','Overall']"|safe }};
+
+          if (latestEvalMetrics && Array.isArray(latestEvalMetrics)) {
+          const labels = Array.isArray(metricLabels) ? metricLabels : metricLabels.split(',');
+          const metricRanges = JSON.parse(document.getElementById('metric_ranges').textContent || '{}');
+          // Truncate displayed labels to max 13 characters but keep full labels for tooltips/definitions
+          const truncate = (s, n) => (typeof s === 'string' && s.length > n) ? (s.slice(0, n) + '...') : s;
+          const fullLabels = labels.slice();
+          const displayLabels = labels.map(l => truncate(l, 13));
+          // Slightly shift the radar canvas downward without increasing container height
+          try { radarEl.style.transform = 'translateY(40px)'; radarEl.style.transition = 'transform 160ms ease-out'; } catch (e) { /* ignore */ }
+          // normalize both Latest and sota metrics
+          const rawThis = latestEvalMetrics.slice(0, labels.length);
+          const rawSota = (sotaMetrics && Array.isArray(sotaMetrics)) ? sotaMetrics.slice(0, labels.length) : new Array(labels.length).fill(0.6);
+          const dataThis = normalizeMetrics(rawThis, labels, metricRanges);
+          const dataSota = normalizeMetrics(rawSota, labels, metricRanges);
+
+          if (window.__evaluatorRadarChart) {
+            try { window.__evaluatorRadarChart.destroy(); } catch (e) { /* ignore */ }
+            window.__evaluatorRadarChart = null;
+          }
+          window.__evaluatorRadarChart = new Chart(radarEl.getContext('2d'), {
+            type: 'radar',
+            data: {
+              labels: displayLabels,
+              // keep full labels for tooltip/definition lookup
+              fullLabels: fullLabels,
+              datasets: [
+                {
+                  label: 'Latest',
+                  data: dataThis,
+                  borderColor: 'rgba(255,110,161,0.9)',
+                  backgroundColor: 'rgba(255,110,161,0.25)',
+                  pointBackgroundColor: 'rgba(255,110,161,0.9)',
+                  pointBorderColor: '#fff',
+                  pointHoverBackgroundColor: '#fff',
+                  pointHoverBorderColor: 'rgba(255,110,161,0.9)',
+                  borderWidth: 2,
+                  pointRadius: 3
+                },
+                {
+                  label: 'SOTA',
+                  data: dataSota,
+                  borderColor: 'rgba(124,58,237,0.9)',
+                  backgroundColor: 'rgba(124,58,237,0.18)',
+                  pointBackgroundColor: 'rgba(124,58,237,0.9)',
+                  pointBorderColor: '#fff',
+                  pointHoverBackgroundColor: '#fff',
+                  pointHoverBorderColor: 'rgba(124,58,237,0.9)',
+                  borderWidth: 2,
+                  pointRadius: 3
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: {
+                onComplete: function() {
+                  try {
+                    const metricDefs = JSON.parse(document.getElementById('metric_definitions').textContent || '{}');
+                    attachRadarLabelTooltips(window.__evaluatorRadarChart, radarEl, metricDefs);
+                  } catch (e) { /* ignore */ }
+                }
+              },
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  backgroundColor: 'rgba(0,0,0,0.7)',
+                  titleColor: 'rgba(255,255,255,0.9)',
+                  bodyColor: 'rgba(255,255,255,0.8)',
+                  borderColor: 'rgba(255,255,255,0.1)',
+                  borderWidth: 1
+                }
+              }
+            }
+          });
+        } else {
+          // 如果没有数据，显示占位信息
+          radarEl.parentElement.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-full text-center">
+              <div class="text-4xl mb-4">📊</div>
+              <h4 class="text-lg font-medium text-white mb-2">No Radar Data</h4>
+              <p class="text-sm muted">Run an evaluation to see performance metrics</p>
+            </div>
+          `;
+        }
+      } catch (e) {
+        console.error('Radar chart initialization failed:', e);
+        radarEl.parentElement.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-full text-center">
+            <div class="text-4xl mb-4">⚠️</div>
+            <h4 class="text-lg font-medium text-white mb-2">Chart Error</h4>
+            <p class="text-sm muted">Failed to load radar chart</p>
+          </div>
+        `;
+      }
+    };
+
+  // 修复后的雷达图标签tooltip函数
+  function attachRadarLabelTooltips(chart, canvasEl, metricDefs) {
+    if (!chart || !canvasEl) return;
+    
+    // 移除之前可能存在的tooltip和事件监听
+    let tip = document.getElementById('radarLabelTooltip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'radarLabelTooltip';
+      tip.className = 'radar-label-tooltip';
+      tip.style.position = 'fixed';
+      tip.style.display = 'none';
+      tip.style.backgroundColor = 'rgba(0,0,0,0.85)';
+      tip.style.color = '#ffffff';
+      tip.style.padding = '8px 10px';
+      tip.style.borderRadius = '6px';
+      tip.style.boxShadow = '0 6px 18px rgba(0,0,0,0.35)';
+      tip.style.zIndex = '9999';
+      tip.style.maxWidth = '360px';
+      tip.style.fontSize = '13px';
+      tip.style.lineHeight = '1.25';
+      tip.style.pointerEvents = 'none';
+      tip.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+      document.body.appendChild(tip);
+    }
+
+    const rScale = chart.scales && chart.scales.r;
+    if (!rScale) return;
+    
+    const displayLabels = (chart.data && chart.data.labels) || [];
+    const fullLabels = (chart.data && chart.data.fullLabels) || displayLabels;
+    let defs = metricDefs || {};
+
+    // 如果服务器没有提供定义，使用默认定义
+    if (!Object.keys(defs).length) {
+      const defaults = {
+        'Task Success': 'Percentage of traces that reached a successful end state.',
+        'Task Completion': 'Fraction of tasks that completed the required actions.',
+        'Overall Score': 'Weighted average of business, orchestration and efficiency metrics.',
+        'Milestone': 'Rate of milestone completion across traces.',
+        'Routing': 'Correctness of routing decisions (higher is better).',
+        'Response Quality': 'Quality score of responses (semantic match / correctness).',
+        'Context': 'Effectiveness of using prior context in decisions.',
+        'Avg Rounds': 'Mean interaction rounds until task completion (lower better).',
+        'Time Eff.': 'Normalized time efficiency (faster = higher).',
+        'Clarification': 'Rate of clarification requests (lower usually better).',
+        'Orchestration': 'Measure of orchestration effectiveness across steps.',
+        'Latency': 'Average response latency (seconds).'
+      };
+      defs = {};
+      fullLabels.forEach((fl, idx) => { 
+        defs[fl] = defaults[fl] || 'No definition available.'; 
+      });
+    }
+
+    const threshold = 50; // 增加触发阈值
+    const pointThreshold = 20;
+
+    // 移除之前的事件监听器
+    if (canvasEl._radarTooltipOnMove) {
+      canvasEl.removeEventListener('mousemove', canvasEl._radarTooltipOnMove);
+      canvasEl.removeEventListener('mouseout', canvasEl._radarTooltipOnLeave);
+    }
+
+    const onMove = (evt) => {
+      const rect = canvasEl.getBoundingClientRect();
+      const cssX = (evt.clientX !== undefined) ? (evt.clientX - rect.left) : (evt.offsetX || evt.layerX || 0);
+      const cssY = (evt.clientY !== undefined) ? (evt.clientY - rect.top) : (evt.offsetY || evt.layerY || 0);
+      const scaleX = canvasEl.width / rect.width;
+      const scaleY = canvasEl.height / rect.height;
+      const canvasX = cssX * scaleX;
+      const canvasY = cssY * scaleY;
+      const avgScale = (scaleX + scaleY) / 2 || 1;
+      const labelThresholdScaled = threshold * avgScale;
+      const pointThresholdScaled = pointThreshold * avgScale;
+      let shown = false;
+
+      // First try Chart.js helper to find nearest elements (more reliable across transforms)
+      try {
+        // Use cached flag to avoid repeated failing calls
+        if (typeof chart.getElementsAtEventForMode === 'function' && chart._radar_eventModeBroken !== true) {
+          // Defensive checks: ensure chart and canvas are intact and event looks valid
+          if (!chart || !chart.canvas || !chart.canvas.ownerDocument || !evt) {
+            // mark broken to avoid attempting the call when chart is in a torn-down state
+            chart._radar_eventModeBroken = true;
+          } else {
+            try {
+              const elems = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, false);
+              if (elems && elems.length) {
+                const el = elems[0];
+                const idx = el.index;
+            const disp = displayLabels[idx] || '';
+            const full = fullLabels[idx] || disp;
+            let scoreDisplay = '-';
+            try {
+              const scoreRaw = chart.data.datasets[0].data[idx];
+              const num = Number(scoreRaw);
+              if (Number.isFinite(num)) scoreDisplay = `${num.toFixed(2)} (${(num * 100).toFixed(2)}%)`;
+            } catch (e) {}
+            const defText = defs[full] || defs[disp] || defs[full.toLowerCase()] || defs[disp.toLowerCase()] || 'No definition available.';
+            let tooltipContent = `<strong style="display:block;margin-bottom:6px">${full}</strong>`;
+            if (defText) tooltipContent += `<div style="font-size:12px;line-height:1.3;margin-bottom:6px;">${defText}</div>`;
+            tooltipContent += `<div style="font-size:12px;opacity:0.9;">Score: ${scoreDisplay}</div>`;
+            tip.innerHTML = tooltipContent;
+            tip.style.left = (evt.clientX + 15) + 'px';
+            tip.style.top = (evt.clientY + 15) + 'px';
+            tip.style.display = 'block';
+            // try to set chart tooltip as well
+            try { if (chart && typeof chart.setActiveElements === 'function') { chart.setActiveElements([{ datasetIndex: el.datasetIndex, index: idx }]); chart.update(); } } catch (e) {}
+            shown = true;
+              }
+            } catch (innerErr) {
+              // Mark broken to avoid spamming console on every mousemove
+              chart._radar_eventModeBroken = true;
+              console.warn('chart.getElementsAtEventForMode failed and has been disabled for this chart instance', innerErr);
+            }
+          }
+        }
+      } catch (e) {
+        // outer safety - shouldn't usually hit
+        chart._radar_eventModeBroken = true;
+        console.warn('chart.getElementsAtEventForMode outer error, disabling for this chart instance', e);
+      }
+
+      // Fallback: manual hit-testing over label positions
+      if (!shown) {
+        for (let i = 0; i < displayLabels.length; i++) {
+          try {
+            let metaPoint = null;
+            try {
+              const meta = chart.getDatasetMeta && chart.getDatasetMeta(0);
+              if (meta && meta.data && meta.data[i]) metaPoint = meta.data[i];
+            } catch (e) {
+              if (rScale && typeof rScale.getPointPosition === 'function') {
+                const radius = rScale.drawingArea || rScale.max || 100;
+                metaPoint = rScale.getPointPosition(i, radius);
+              }
+            }
+            if (!metaPoint) continue;
+            const dx = metaPoint.x - canvasX;
+            const dy = metaPoint.y - canvasY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const disp = displayLabels[i] || '';
+            const full = fullLabels[i] || disp;
+            if (dist <= labelThresholdScaled) {
+              let scoreDisplay = '-';
+              try { const scoreRaw = chart.data.datasets[0].data[i]; const num = Number(scoreRaw); if (Number.isFinite(num)) scoreDisplay = `${num.toFixed(2)} (${(num * 100).toFixed(2)}%)`; } catch (e) {}
+              const defText = defs[full] || defs[disp] || defs[full.toLowerCase()] || defs[disp.toLowerCase()] || 'No definition available.';
+              let tooltipContent = `<strong style="display:block;margin-bottom:6px">${full}</strong>`;
+              if (defText) tooltipContent += `<div style="font-size:12px;line-height:1.3;margin-bottom:6px;">${defText}</div>`;
+              tooltipContent += `<div style="font-size:12px;opacity:0.9;">Score: ${scoreDisplay}</div>`;
+              tip.innerHTML = tooltipContent;
+              tip.style.left = (evt.clientX + 15) + 'px';
+              tip.style.top = (evt.clientY + 15) + 'px';
+              tip.style.display = 'block';
+              try { if (chart && typeof chart.setActiveElements === 'function') { chart.setActiveElements([{ datasetIndex: 0, index: i }]); chart.update(); } } catch (e) {}
+              shown = true; break;
+            }
+          } catch (e) { console.warn('Error processing radar label:', e); }
+        }
+      }
+
+      if (!shown) {
+        tip.style.display = 'none';
+      }
+    };
+
+    const onLeave = () => {
+      if (tip) tip.style.display = 'none';
+    };
+
+    // 保存引用以便后续移除
+    canvasEl._radarTooltipOnMove = onMove;
+    canvasEl._radarTooltipOnLeave = onLeave;
+
+    canvasEl.addEventListener('mousemove', onMove);
+    canvasEl.addEventListener('mouseout', onLeave);
+  }
+    // Helper: render task level breakdown into the summary panel
+    const renderTaskLevelBreakdown = (summary) => {
+      try {
+        const container = document.getElementById('task-level-breakdown');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!summary) {
+          container.innerHTML = '<div class="text-sm muted">No task level data</div>';
+          return;
+        }
+        // Prefer server-provided ordered breakdown array if available, else fall back to dict
+        let tlb = null;
+        if (summary.task_level_breakdown_formatted_ordered && Array.isArray(summary.task_level_breakdown_formatted_ordered)) {
+          tlb = summary.task_level_breakdown_formatted_ordered;
+        } else if (summary.task_level_breakdown_formatted) {
+          tlb = summary.task_level_breakdown_formatted;
+        } else if (summary.task_config_analysis && summary.task_config_analysis.task_level_breakdown) {
+          tlb = summary.task_config_analysis.task_level_breakdown;
+        } else if (summary.task_level) {
+          tlb = summary.task_level;
+        } else if (summary.task_level_breakdown) {
+          tlb = summary.task_level_breakdown;
+        }
+        if (!tlb) {
+          container.innerHTML = '<div class="text-sm muted">No task level data</div>';
+          return;
+        }
+
+        // Normalize into an entries array: [{level, count, avg_score, avg_score_display}, ...]
+        let entries = [];
+        if (Array.isArray(tlb)) {
+          entries = tlb.map(it => {
+            if (!it) return null;
+            if (it.level) return it;
+            // if array items are simple objects with keys, try to normalize
+            return it;
+          }).filter(Boolean);
+        } else if (typeof tlb === 'object') {
+          entries = Object.keys(tlb).map(k => {
+            const v = tlb[k] || {};
+            return { level: k, count: v.count, avg_score: v.avg_score, avg_score_display: v.avg_score_display };
+          });
+        }
+
+        // Prefer canonical ordering for task-levels: T1/T2/T3/T4 first, then lexicographic
+        const priority = { 'T1': 1, 'T2': 2, 'T3': 3, 'T4': 4 };
+        entries.sort((a, b) => {
+          const la = (a && a.level) ? String(a.level).toUpperCase().trim() : '';
+          const lb = (b && b.level) ? String(b.level).toUpperCase().trim() : '';
+          const pa = priority[la] || 999;
+          const pb = priority[lb] || 999;
+          if (pa !== pb) return pa - pb;
+          // fallback to numeric or lexicographic
+          const na = parseInt(la.replace(/[^0-9]/g,''),10) || 0;
+          const nb = parseInt(lb.replace(/[^0-9]/g,''),10) || 0;
+          if (na && nb) return na - nb;
+          return la.localeCompare(lb);
+        });
+
+        if (entries.length === 0) {
+          container.innerHTML = '<div class="text-sm muted">No task level data</div>';
+          return;
+        }
+
+        entries.forEach((entry) => {
+          const lvl = entry.level;
+          const item = entry || {};
+          // If tlb came from formatted source, its values may already be prepared
+          let count = (typeof item.count === 'number') ? item.count : (typeof item.count === 'string' ? item.count : (item.count || '-'));
+          // Format average as decimal (avg_score). Rules:
+          // - prefer numeric `avg_score` if present and show two decimals (e.g. 0.62)
+          // - else, try to parse `avg_score_display` and convert percent->decimal when needed
+          // - fall back to '-' when missing or unparsable
+          const formatAvgDecimal = (it) => {
+            try {
+              if (!it) return '-';
+              // numeric avg_score preferred
+              if (typeof it.avg_score !== 'undefined' && it.avg_score !== null) {
+                const raw = Number(it.avg_score);
+                if (Number.isFinite(raw)) return raw.toFixed(2);
+              }
+              // parse display string
+              if (it.avg_score_display) {
+                let s = String(it.avg_score_display).trim();
+                const hasPercent = s.includes('%');
+                s = s.replace('%', '').trim();
+                const n = Number(s);
+                if (Number.isFinite(n)) {
+                  if (hasPercent) {
+                    // e.g. '62.08%' -> 0.6208
+                    return (n / 100.0).toFixed(2);
+                  }
+                  // ambiguous: if value in 0..1 assume decimal, if 1..100 assume percent
+                  if (Math.abs(n) <= 1) return n.toFixed(2);
+                  if (n > 1 && n <= 100) return (n / 100.0).toFixed(2);
+                  return n.toFixed(2);
+                }
+              }
+            } catch (e) {
+              // ignore
+            }
+            return '-';
+          };
+
+          let avgDisplay = formatAvgDecimal(item);
+          const card = document.createElement('div');
+          card.className = 'p-3 metric-card';
+          // build mini-bar width based on avg if numeric
+          let miniBarInner = '';
+          try {
+            let pct = null;
+            if (item.avg_score_display && typeof item.avg_score_display === 'string' && item.avg_score_display.endsWith('%')) {
+              pct = parseFloat(item.avg_score_display.replace('%',''));
+            } else if (item.avg_score !== undefined && item.avg_score !== null) {
+              const num = Number(item.avg_score);
+              if (Number.isFinite(num)) {
+                pct = (Math.abs(num) <= 1) ? (num * 100.0) : (Math.min(100, num));
+              }
+            }
+            if (pct !== null && !isNaN(pct)) {
+              const w = Math.max(2, Math.min(100, Math.round(pct)));
+              miniBarInner = `<div class="mini-bar"><i style="width:${w}%;"></i></div>`;
+            }
+          } catch (e) { miniBarInner = ''; }
+
+          card.innerHTML = `
+            <div class="text-xs muted level" title="${lvl}">${lvl}</div>
+            <div class="count">${count}</div>
+            <div class="avg">Avg: ${avgDisplay}</div>
+            ${miniBarInner}
+          `;
+          container.appendChild(card);
+        });
+        // (No distribution fallback here: Task Distribution must show task levels only)
+      } catch (e) {
+        console.warn('renderTaskLevelBreakdown failed', e);
+      }
+    };
+ 
+    // Show More functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeRadarChart();
+      initializeCharts();
+      // initialize task level breakdown from server-side summary JSON
+      try {
+        window._serverLatestSummary = JSON.parse(document.getElementById('latest_evaluator_summary').textContent || 'null');
+      } catch (e) { window._serverLatestSummary = null; }
+      // Debug: print initial server summary to help diagnose missing task-level breakdown
+          try {
+        console.log('Initial latest_evaluator_summary (from server JSON script):', window._serverLatestSummary);
+        if (window._serverLatestSummary) {
+          // show available summary keys and any task-level fields
+          try { console.log('summary keys:', Object.keys(window._serverLatestSummary)); } catch (e) {}
+          try { console.log('task_level_breakdown_formatted:', window._serverLatestSummary.task_level_breakdown_formatted); } catch (e) {}
+          try { console.log('task_level_breakdown_formatted_ordered:', window._serverLatestSummary.task_level_breakdown_formatted_ordered); } catch (e) {}
+          renderTaskLevelBreakdown(window._serverLatestSummary);
+
+          // Ensure success rate is displayed immediately even if updateEvaluatorPanel isn't available yet
+          try {
+            const el = document.getElementById('evaluator-success-rate');
+            if (el) {
+              const s = window._serverLatestSummary;
+              if (s && typeof s.success_rate !== 'undefined' && s.success_rate !== null) {
+                const v = Number(s.success_rate);
+                if (Number.isFinite(v)) el.textContent = (v * 100).toFixed(2) + '%';
+                else el.textContent = (s.success_rate_display || '-');
+              } else if (s && typeof s.success_rate_display !== 'undefined' && s.success_rate_display !== null) {
+                el.textContent = s.success_rate_display;
+              }
+            }
+          } catch (e) { /* ignore */ }
+
+          // also populate total traces inline and average scores if available
+          try {
+            const s = window._serverLatestSummary || {};
+            const totalEl = document.getElementById('evaluator-total-traces-inline');
+            if (totalEl && typeof s.total_traces !== 'undefined') totalEl.textContent = s.total_traces;
+
+            const avg = s.average_scores || {};
+            const mEl = document.getElementById('evaluator-milestone-rate');
+            const oeEl = document.getElementById('evaluator-orch-eff');
+            const latEl = document.getElementById('evaluator-orch-latency');
+            if (mEl) {
+              if (typeof avg.avg_milestone_completion_rate !== 'undefined' && avg.avg_milestone_completion_rate !== null) {
+                const v = Number(avg.avg_milestone_completion_rate);
+                if (Number.isFinite(v)) mEl.textContent = (v * 100).toFixed(2) + '%'; else mEl.textContent = '-';
+              }
+            }
+            if (oeEl) {
+              if (typeof avg.avg_orchestration_efficiency !== 'undefined' && avg.avg_orchestration_efficiency !== null) {
+                const v = Number(avg.avg_orchestration_efficiency);
+                if (Number.isFinite(v)) oeEl.textContent = (v * 100).toFixed(2) + '%'; else oeEl.textContent = '-';
+              }
+            }
+            if (latEl) {
+              if (typeof avg.avg_orchestration_latency_seconds !== 'undefined' && avg.avg_orchestration_latency_seconds !== null) {
+                const v = Number(avg.avg_orchestration_latency_seconds);
+                if (Number.isFinite(v)) latEl.textContent = v.toFixed(2) + 's'; else latEl.textContent = '-';
+              }
+            }
+          } catch (e) { /* ignore */ }
+
+          try {
+            const metricsInit = JSON.parse(document.getElementById('latest_evaluator_metrics').textContent || 'null');
+            if (typeof updateEvaluatorPanel === 'function') {
+              updateEvaluatorPanel(window._serverLatestSummary, metricsInit);
+            }
+          } catch (e) { /* ignore if metrics missing */ }
+        }
+      } catch(e){ console.warn('Error while logging initial latest_evaluator_summary', e); }
+      
+      // Modal functionality
+      const evalModal = document.getElementById('eval-modal');
+      const evalOverlay = document.getElementById('eval-overlay');
+      
+      document.getElementById('btn-open-eval').addEventListener('click', () => {
+        evalModal.classList.remove('hidden');
+        evalModal.classList.add('flex');
+      });
+      
+      function closeEvalModal() { 
+        evalModal.classList.add('hidden'); 
+        evalModal.classList.remove('flex'); 
+        document.getElementById('modal-status').textContent = ''; 
+      }
+      
+      document.getElementById('eval-close').addEventListener('click', closeEvalModal);
+      document.getElementById('modal-cancel').addEventListener('click', closeEvalModal);
+      evalOverlay.addEventListener('click', closeEvalModal);
+
+      // Form submission — submit real multipart/form-data to backend upload endpoint
+      document.getElementById('modal-submit').addEventListener('click', async function() {
+        console.log("=== FILE UPLOAD START ===");
+        const statusEl = document.getElementById('modal-status');
+        const form = document.getElementById('eval-form');
+        const submitBtn = document.getElementById('modal-submit');
+        
+        console.log("Uploading evaluation files...");
+        statusEl.textContent = 'Uploading and starting evaluation...';
+        submitBtn.disabled = true;
+
+        try {
+          const formData = new FormData(form);
+
+          // POST to Django view named 'upload' (URL name defined in leaderboard.urls)
+          const resp = await fetch("{% url 'upload' %}", {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+
+          console.log("Upload response status:", resp.status);
+          console.log("Redirected:", resp.redirected);
+          
+          // If backend redirected (e.g. to dashboard), follow
+          if (resp.redirected) {
+            window.location.href = resp.url;
+            return;
+          }
+
+          if (resp.ok) {
+            // try to read text or json for feedback
+            let txt = '';
+            for (let i = 0; i < labels.length; i++) {
+              const key = labels[i];
+              const range = ranges && ranges[key] ? ranges[key] : null;
+              let val = rawArr && rawArr[key] !== undefined ? rawArr[key] : null;
+              if (val === null || val === undefined) { out.push(null); continue; }
+              if (range && range.type === 'ratio') {
+                val = Number(val);
+              } else if (range && range.lower_better) {
+                const min = (range.min !== undefined) ? range.min : 0;
+                const max = (range.max !== undefined) ? range.max : 1;
+                val = 1 - ((Number(val) - min) / (max - min));
+              } else if (range && (range.max !== undefined && range.min !== undefined)) {
+                const min = range.min;
+                const max = range.max;
+                val = (Number(val) - min) / (max - min);
+              } else {
+                val = Number(val);
+              }
+              // normalize internal precision to 4 decimals for consistent internal calculations
+              if (val === null || isNaN(val)) {
+                out.push(null);
+              } else {
+                out.push(Number(val.toFixed(4)));
+              }
+            }
+            return out;
+            
+            allEntries.forEach((entry, index) => {
+              const row = document.createElement('tr');
+              row.className = 'border-b border-gray-800 hover:bg-gray-800/30 transition-colors';
+              row.innerHTML = `
+                <td class="py-4 px-4">
+                  <div class="flex items-center">
+                    <span class="font-medium">#${index + 1}</span>
+                    ${index < 3 ? `<span class="ml-2">${index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>` : ''}
+                  </div>
+                </td>
+                <td class="py-4 px-4">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-pink-500 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mr-3">
+                      ${entry.orchestrator.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div class="font-medium text-white">${entry.orchestrator}</div>
+                  </div>
+                </td>
+                <td class="py-4 px-4 text-sm">${entry.llm}</td>
+                <td class="py-4 px-4">
+                  <div class="flex items-center">
+                    <div class="text-lg font-bold text-white mr-3">${entry.overall.toFixed(2)}</div>
+                    <div class="w-16 bg-gray-700 rounded-full h-2">
+                      <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: ${entry.overall_percent}%"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-4 text-sm">${entry.business.toFixed(2)}</td>
+                <td class="py-4 px-4 text-sm">${entry.orchestration.toFixed(2)}</td>
+                <td class="py-4 px-4 text-sm">${entry.efficiency.toFixed(2)}</td>
+                <td class="py-4 px-4 text-sm">${entry.performance.toFixed(2)}</td>
+              `;
+              tableBody.appendChild(row);
+            });
+            
+            button.style.display = 'none';
+          }
+        } catch (e) {
+          console.warn('Evaluation upload failed', e);
+          try { statusEl.textContent = 'Upload failed'; } catch (ee) {}
+        } finally {
+          try { submitBtn.disabled = false; } catch (ee) {}
+        }
+      });
+      // no-op here; tooltip attach will be done after radar is created elsewhere
+
+      // Setup show more for each domain
+      // Ensure helper exists: renders full table when 'Show All' clicked
+      function setupShowMore(buttonId, tableBodyId, allEntries) {
+        try {
+          const btn = document.getElementById(buttonId);
+          const tbody = document.getElementById(tableBodyId);
+          if (!btn || !tbody) return;
+          btn.addEventListener('click', () => {
+            try {
+              tbody.innerHTML = '';
+              allEntries.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-800 hover:bg-gray-800/30 transition-colors';
+                row.innerHTML = `
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <span class="font-medium">#${index + 1}</span>
+                      ${index < 3 ? `<span class="ml-2">${index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>` : ''}
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-gradient-to-r from-pink-500 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-sm mr-3">
+                        ${(entry.orchestrator || '').slice(0,2).toUpperCase()}
+                      </div>
+                      <div class="font-medium text-white">${entry.orchestrator || ''}</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">${entry.llm || ''}</td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center">
+                      <div class="text-lg font-bold text-white mr-3">${(typeof entry.overall === 'number') ? entry.overall.toFixed(2) : (entry.overall || '')}</div>
+                      <div class="w-16 bg-gray-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: ${entry.overall_percent || 0}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-sm">${(typeof entry.business === 'number') ? entry.business.toFixed(2) : (entry.business || '')}</td>
+                  <td class="py-4 px-4 text-sm">${(typeof entry.orchestration === 'number') ? entry.orchestration.toFixed(2) : (entry.orchestration || '')}</td>
+                  <td class="py-4 px-4 text-sm">${(typeof entry.efficiency === 'number') ? entry.efficiency.toFixed(2) : (entry.efficiency || '')}</td>
+                  <td class="py-4 px-4 text-sm">${(typeof entry.performance === 'number') ? entry.performance.toFixed(2) : (entry.performance || '')}</td>
+                `;
+                tbody.appendChild(row);
+              });
+              btn.style.display = 'none';
+            } catch (e) {
+              console.warn('setupShowMore render failed', e);
+            }
+          });
+        } catch (e) { console.warn('setupShowMore init failed', e); }
+      }
+
+      setupShowMore('travel-show-more', 'travel-table-body', JSON.parse(document.getElementById('travel_competitors').textContent || '[]'));
+      setupShowMore('hr-show-more', 'hr-table-body', JSON.parse(document.getElementById('hr_competitors').textContent || '[]'));
+      setupShowMore('it-show-more', 'it-table-body', JSON.parse(document.getElementById('it_competitors').textContent || '[]'));
+      setupShowMore('crm-show-more', 'crm-table-body', JSON.parse(document.getElementById('crm_competitors').textContent || '[]'));
+
+      // Evaluator panel: radar and details modal
+      try {
+        const latestEvalMetrics = JSON.parse(document.getElementById('latest_evaluator_metrics').textContent || 'null');
+        const sotaMetrics = JSON.parse(document.getElementById('sota_metrics').textContent || 'null');
+        const metricLabels = JSON.parse(document.getElementById('metric_labels').textContent || '[]');
+
+        const radarEl = document.getElementById('evaluatorRadar');
+          if (radarEl && latestEvalMetrics && Array.isArray(latestEvalMetrics)) {
+          const labels = Array.isArray(metricLabels) ? metricLabels : metricLabels.split(',');
+          const metricRanges = JSON.parse(document.getElementById('metric_ranges').textContent || '{}');
+          // Truncate displayed labels to max 13 characters but keep full labels for tooltips/definitions
+          const truncate = (s, n) => (typeof s === 'string' && s.length > n) ? (s.slice(0, n) + '...') : s;
+          const fullLabels = labels.slice();
+          const displayLabels = labels.map(l => truncate(l, 13));
+          // Slight downward shift for better visual balance
+          try { radarEl.style.transform = 'translateY(30px)'; radarEl.style.transition = 'transform 160ms ease-out'; } catch (e) { /* ignore */ }
+          const rawThis = latestEvalMetrics.slice(0, labels.length);
+          const rawSota = (sotaMetrics && Array.isArray(sotaMetrics)) ? sotaMetrics.slice(0, labels.length) : new Array(labels.length).fill(0.6);
+          const dataThis = normalizeMetrics(rawThis, labels, metricRanges);
+          const dataSota = normalizeMetrics(rawSota, labels, metricRanges);
+
+          if (window.__evaluatorRadarChart) {
+            try { window.__evaluatorRadarChart.destroy(); } catch (e) { /* ignore */ }
+            window.__evaluatorRadarChart = null;
+          }
+          window.__evaluatorRadarChart = new Chart(radarEl.getContext('2d'), {
+            type: 'radar',
+            data: {
+              labels: displayLabels,
+              // keep full labels for tooltip/definition lookup
+              fullLabels: fullLabels,
+              datasets: [
+                {
+                  label: 'Latest',
+                  data: dataThis,
+                  borderColor: 'rgba(255,110,161,0.9)',
+                  backgroundColor: 'rgba(255,110,161,0.25)',
+                  pointBackgroundColor: 'rgba(255,110,161,0.9)'
+                },
+                {
+                  label: 'SOTA',
+                  data: dataSota,
+                  borderColor: 'rgba(124,58,237,0.9)',
+                  backgroundColor: 'rgba(124,58,237,0.18)',
+                  pointBackgroundColor: 'rgba(124,58,237,0.9)'
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              aspectRatio: 1,
+              animation: {
+                onComplete: function() {
+                  try {
+                    const metricDefs = JSON.parse(document.getElementById('metric_definitions').textContent || '{}');
+                    attachRadarLabelTooltips(window.__evaluatorRadarChart, radarEl, metricDefs);
+                  } catch (e) { /* ignore */ }
+                }
+              },
+              elements: {
+                point: { radius: 4 }
+              },
+              scales: {
+                r: {
+                  suggestedMin: 0,
+                  suggestedMax: 1.0,
+                  ticks: { display: false },
+                  grid: { color: 'rgba(255,255,255,0.06)' },
+                  pointLabels: {
+                    color: 'rgba(255,255,255,0.95)',
+                    font: { size: 13 },
+                    padding: 18
+                  }
+                }
+              },
+              plugins: { legend: { display: false, labels: { color: 'rgba(255,255,255,0.8)' } } }
+            }
+          });
+          
+        }
+
+        // Details modal removed: 'View details' now links directly to the top campaign when available.
+      } catch (e) {
+        console.warn('Evaluator panel init failed', e);
+      }
+
+      // Polling: periodically check backend for latest evaluator results and reload when new results appear
+      try {
+        const pageTopCampaignId = `{% if top_entry %}{{ top_entry.campaign.id }}{% else %}{% endif %}`;
+        const pageHasSummary = (function(){
+          try { const el = document.getElementById('latest_evaluator_summary'); if(!el) return false; const txt = el.textContent || ''; return txt.trim() !== 'null' && txt.trim() !== ''; } catch(e){ return false; }
+        })();
+
+        const pollUrl = '{% url "latest_evaluator_summary" %}';
+        // Poll every 5 minutes (300000 ms) to reduce load
+        const pollIntervalMs = 300000;
+
+        // Helper: render task level breakdown into the summary panel
+        
+
+        // Update evaluator panel (summary metrics and radar) without full page reload
+        const updateEvaluatorPanel = (normSummary, normMetrics) => {
+          try {
+            // Debug: print normalized payload received by frontend
+            console.log('updateEvaluatorPanel called with normalized summary:', normSummary, 'normalized metrics:', normMetrics);
+            if (!normSummary && !normMetrics) return;
+
+            // summary fields
+            if (normSummary) {
+              if (document.getElementById('evaluator-orchestrator') && normSummary.orchestrator) document.getElementById('evaluator-orchestrator').textContent = normSummary.orchestrator;
+              if (document.getElementById('evaluator-llm') && normSummary.llm_model) document.getElementById('evaluator-llm').textContent = normSummary.llm_model;
+              if (document.getElementById('evaluator-total-traces-inline') && typeof normSummary.total_traces !== 'undefined') document.getElementById('evaluator-total-traces-inline').textContent = normSummary.total_traces;
+              if (document.getElementById('evaluator-success-rate')) {
+                // Prefer numeric success_rate (0..1). If missing, fall back to pre-formatted display string.
+                const el = document.getElementById('evaluator-success-rate');
+                try {
+                  if (typeof normSummary.success_rate !== 'undefined' && normSummary.success_rate !== null) {
+                    const v = Number(normSummary.success_rate);
+                    if (Number.isFinite(v)) {
+                      el.textContent = (v * 100).toFixed(2) + '%';
+                    } else {
+                      // non-finite numeric fallback
+                      el.textContent = (normSummary.success_rate_display || '-');
+                    }
+                  } else if (typeof normSummary.success_rate_display !== 'undefined' && normSummary.success_rate_display !== null) {
+                    el.textContent = normSummary.success_rate_display;
+                  } else {
+                    el.textContent = '-';
+                  }
+                } catch (e) {
+                  el.textContent = (normSummary && normSummary.success_rate_display) ? normSummary.success_rate_display : '-';
+                }
+              }
+              // average_scores: milestone, orchestration efficiency, latency
+              try {
+                const avg = normSummary.average_scores || {};
+                if (document.getElementById('evaluator-milestone-rate')) {
+                  const v = Number(avg.avg_milestone_completion_rate);
+                  if (Number.isFinite(v)) document.getElementById('evaluator-milestone-rate').textContent = (v * 100).toFixed(2) + '%';
+                  else document.getElementById('evaluator-milestone-rate').textContent = (avg && avg.avg_milestone_completion_rate_display) ? avg.avg_milestone_completion_rate_display : '-';
+                }
+                if (document.getElementById('evaluator-orch-eff')) {
+                  const v = Number(avg.avg_orchestration_efficiency);
+                  if (Number.isFinite(v)) document.getElementById('evaluator-orch-eff').textContent = (v * 100).toFixed(2) + '%';
+                  else document.getElementById('evaluator-orch-eff').textContent = (avg && avg.avg_orchestration_efficiency_display) ? avg.avg_orchestration_efficiency_display : '-';
+                }
+                if (document.getElementById('evaluator-orch-latency')) {
+                  const v = Number(avg.avg_orchestration_latency_seconds);
+                  if (Number.isFinite(v)) document.getElementById('evaluator-orch-latency').textContent = v.toFixed(2) + 's';
+                  else document.getElementById('evaluator-orch-latency').textContent = (avg && avg.avg_orchestration_latency_seconds_display) ? avg.avg_orchestration_latency_seconds_display : '-';
+                }
+              } catch (e) { /* ignore */ }
+              // Update task-level-breakdown using the latest server-side summary cache if available
+              try {
+                if (window._serverLatestSummary) renderTaskLevelBreakdown(window._serverLatestSummary);
+                else renderTaskLevelBreakdown(normSummary);
+              } catch (e) { /* ignore */ }
+
+              // distribution
+              if (normSummary.distribution) {
+                const d = normSummary.distribution;
+                if (document.getElementById('dist-good')) document.getElementById('dist-good').textContent = d.good || 0;
+                if (document.getElementById('dist-fair')) document.getElementById('dist-fair').textContent = d.fair || 0;
+                if (document.getElementById('dist-medium')) document.getElementById('dist-medium').textContent = d.medium || 0;
+                if (document.getElementById('dist-poor')) document.getElementById('dist-poor').textContent = d.poor || 0;
+              }
+            }
+
+            // radar metrics update
+            if (Array.isArray(normMetrics) && window.__evaluatorRadarChart) {
+              try {
+                const labels = window.__evaluatorRadarChart.data.labels || [];
+                // normalize using metric_ranges from page (if available)
+                let metricRanges = {};
+                try { metricRanges = JSON.parse(document.getElementById('metric_ranges').textContent || '{}'); } catch(e){}
+                const normalize = (rawArr) => {
+                  if (!Array.isArray(labels)) return rawArr;
+                  const out = new Array(labels.length).fill(0);
+                  for (let i=0;i<labels.length;i++){
+                    const raw = (Array.isArray(rawArr) && rawArr.length>i) ? rawArr[i] : null;
+                    const rule = metricRanges[labels[i]] || {};
+                    const type = rule.type || 'ratio';
+                    const max = (typeof rule.max === 'number') ? rule.max : 1.0;
+                    let val = 0;
+                    if (raw === null || raw === undefined) val = 0;
+                    else {
+                      const num = Number(raw);
+                      if (Number.isFinite(num)){
+                        if (type === 'ratio') val = Math.max(0, Math.min(1, num));
+                        else if (type === 'higher_better') val = Math.max(0, Math.min(1, num/max));
+                        else if (type === 'lower_better') { if (max<=0) val=0; else { val = 1 - (num/max); val = Math.max(0, Math.min(1, val)); }}
+                        else val = Math.max(0, Math.min(1, num));
+                      } else val = 0;
+                    }
+                    out[i] = val;
+                  }
+                  return out;
+                };
+
+                const dataThis = normalize(normMetrics);
+                // update first dataset (Latest)
+                if (window.__evaluatorRadarChart.data.datasets && window.__evaluatorRadarChart.data.datasets[0]) {
+                  window.__evaluatorRadarChart.data.datasets[0].data = dataThis;
+                  window.__evaluatorRadarChart.update();
+                  console.log('Radar chart updated with data:', dataThis);
+                }
+              } catch (e) {
+                console.warn('Failed to update radar chart', e);
+              }
+            }
+          } catch (e) {
+            console.warn('updateEvaluatorPanel error', e);
+          }
+        };
+
+        setInterval(async () => {
+          try {
+            const resp = await fetch(pollUrl, { credentials: 'same-origin' });
+            if (!resp.ok) return;
+            const j = await resp.json();
+            // Debug: log raw response from latest_evaluator_summary
+            console.log('Polled latest_evaluator_summary response:', j);
+            // Additionally log common summary fallbacks to inspect where task-level data may live
+            try { console.log('j.summary:', j.summary); } catch (e) {}
+            try { console.log('j.formatted_summary:', j.formatted_summary); } catch (e) {}
+            try { console.log('j.normalized_summary:', j.normalized_summary); } catch (e) {}
+            try { console.log('task_level_breakdown_formatted_ordered present?:', !!(j.summary && j.summary.task_level_breakdown_formatted_ordered) || !!(j.formatted_summary && j.formatted_summary.task_level_breakdown_formatted_ordered) || !!(j.normalized_summary && j.normalized_summary.task_level_breakdown_formatted_ordered)); } catch (e) {}
+            if (!j || !j.has_results) return;
+
+            // If normalized payload is present and is newer, update panel
+            const remoteTs = j.last_modified || null;
+            const norm = j.normalized_summary || null;
+            const nmetrics = j.normalized_metrics || null;
+
+            // cache the most complete server-provided summary for rendering task-level breakdown
+            window._serverLatestSummary = j.summary || j.formatted_summary || j.normalized_summary || window._serverLatestSummary;
+
+            // Debug: show what will be applied
+            console.log('Normalized payload chosen for update:', { norm, nmetrics, remoteTs });
+            // if we haven't set a timestamp yet, or remote changed, update
+            if (!window._latestEvalTimestamp || (remoteTs && window._latestEvalTimestamp !== remoteTs)) {
+              if (norm || nmetrics) {
+                updateEvaluatorPanel(norm, nmetrics);
+                try { renderTaskLevelBreakdown(window._serverLatestSummary); } catch(e){}
+              }
+              window._latestEvalTimestamp = remoteTs || window._latestEvalTimestamp || (new Date()).toISOString();
+            }
+
+            // also if campaign id changed and we have no remoteTs, force update
+            if (j.campaign_id && window._latestCampaignId && window._latestCampaignId !== j.campaign_id) {
+              if (norm || nmetrics) {
+                updateEvaluatorPanel(norm, nmetrics);
+                try { renderTaskLevelBreakdown(window._serverLatestSummary); } catch(e){}
+              }
+              window._latestCampaignId = j.campaign_id;
+            } else if (j.campaign_id && !window._latestCampaignId) {
+              window._latestCampaignId = j.campaign_id;
+            }
+
+          } catch (e) {
+            // swallow errors; polling is best-effort
+          }
+        }, pollIntervalMs);
+      } catch (e) {
+        // ignore polling setup errors
+      }
+
+    });
+  </script>
+</body>
+</html>

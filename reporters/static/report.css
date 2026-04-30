@@ -1,0 +1,35 @@
+:root{
+  --metric-card-bg: #ffffff;
+  --metric-card-border: #e6e6e6;
+  --metric-doc-bg: #f8fafc;
+  --accent-good: #059669; /* emerald-600 */
+  --accent-warn: #d97706; /* amber-600 */
+  --accent-mid: #f97316; /* orange-500 */
+  --accent-bad: #dc2626; /* red-600 */
+}
+
+.metric-card{
+  background: var(--metric-card-bg);
+  border: 1px solid var(--metric-card-border);
+}
+
+.metric-weight-badge{
+  min-width:36px;
+  text-align:center;
+}
+
+.metric-bar{ height: 0.5rem; border-radius: 9999px; }
+.metric-bar > div { height: 100%; }
+
+/* Improve contrast for the evaluator docs area */
+.evaluator-docs-render{ background: var(--metric-doc-bg); padding: 1rem; border-radius: 0.5rem; }
+.evaluator-docs-render h2, .evaluator-docs-render h3{ color: #0f172a; }
+.evaluator-docs-render p, .evaluator-docs-render li { color: #1f2937; }
+
+/* Make pre block readable when visible */
+.evaluator-docs-raw{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace; font-size:0.9rem; }
+
+/* Small responsive tweaks */
+@media (max-width: 640px){
+  .metric-weight-badge{ min-width:34px; padding:0 6px; }
+}

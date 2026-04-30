@@ -1,0 +1,965 @@
+version: "V1_20251208_2237"
+tasks:
+  T1_001:
+    level: "T1"
+    query: "How's the weather in Shanghai?"
+    expected_subagents: ["weather_forecast_check"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives Shanghai weather info"]
+    system_side_milestones: ["Called weather_forecast_check for Shanghai"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple query: Check current weather in Shanghai."
+  T1_002:
+    level: "T1"
+    query: "Recommend top attractions in Beijing and opening hours"
+    expected_subagents: ["travel_planning"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives list of top attractions in Beijing", "User receives opening hours for attractions"]
+    system_side_milestones: ["Called travel_planning agent to get top attractions"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Recommend top attractions in Beijing with their opening hours."
+  T1_003:
+    level: "T1"
+    query: "What local events are happening this afternoon in Guangzhou?"
+    expected_subagents: ["news_search"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives list of local events in Guangzhou for this afternoon"]
+    system_side_milestones: ["Called news_search to query events"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple query for local events in Guangzhou happening this afternoon."
+  T1_004:
+    level: "T1"
+    query: "Search flights from Chengdu to Xiamen, earliest departure"
+    expected_subagents: ["flight_search"]
+    expected_clarifications: []
+    user_side_milestones: ["User notified of earliest flights from Chengdu to Xiamen"]
+    system_side_milestones: ["Called flight_search to query earliest flights"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Search for earliest flights from Chengdu to Xiamen"
+  T1_005:
+    level: "T1"
+    query: "Find the cheapest ticket from Chengdu to Beijing"
+    expected_subagents: ["flight_search"]
+    expected_clarifications: ["travel_date"]
+    user_side_milestones: ["User notified of cheapest Chengdu-Beijing ticket"]
+    system_side_milestones: ["Called flight_search to query cheapest ticket"]
+    complexity_factors: ["single_intent", "direct_execution", "requires_clarification"]
+    description: "Simple flight search for cheapest ticket from Chengdu to Beijing"
+  T1_006:
+    level: "T1"
+    query: "Find hotels near Beijing, hostels and budget hotels acceptable"
+    expected_subagents: ["hotel_accommodation_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives list of hotels near Beijing"]
+    system_side_milestones: ["Called hotel_accommodation_recommendation to query hotels"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple hotel search for budget hotels and hostels near Beijing."
+  T1_007:
+    level: "T1"
+    query: "Query transport options from Hangzhou to Nanjing"
+    expected_subagents: ["travel_planning"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives transport options Hangzhou-Nanjing"]
+    system_side_milestones: ["Called travel_planning to get transport options"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple query: Search transport options from Hangzhou to Nanjing."
+  T1_008:
+    level: "T1"
+    query: "What's the current temperature in Shenzhen"
+    expected_subagents: ["weather_forecast_check"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives current temperature for Shenzhen"]
+    system_side_milestones: ["Called weather_forecast_check for Shenzhen"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Query the current temperature in Shenzhen"
+  T1_009:
+    level: "T1"
+    query: "Give me the top 5 tourist spots in Hangzhou"
+    expected_subagents: ["travel_planning"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives top 5 tourist spots in Hangzhou"]
+    system_side_milestones: ["Called travel_planning to get attraction"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Retrieve top 5 tourist spots in Hangzhou."
+  T1_010:
+    level: "T1"
+    query: "Check local events happening today in Chengdu"
+    expected_subagents: ["news_search"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives list of Chengdu events happening today"]
+    system_side_milestones: ["Called news_search to query events"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Query local events happening today in Chengdu."
+  T1_011:
+    level: "T1"
+    query: "Search for cheap flights from Beijing to Xi’an"
+    expected_subagents: ["flight_search"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives cheap flights from Beijing to Xi’an"]
+    system_side_milestones: ["Called flight_search to find cheap flights"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Search for cheap flights from Beijing to Xi’an."
+  T1_012:
+    level: "T1"
+    query: "Find hotels in Guilin near the river"
+    expected_subagents: ["hotel_accommodation_recommendation"]
+    expected_clarifications: ["checkin_date", "checkout_date"]
+    user_side_milestones: ["User receives list of hotels near river in Guilin"]
+    system_side_milestones: ["Called hotel_accommodation_recommendation to find hotels"]
+    complexity_factors: ["single_intent", "direct_execution", "may_require_date_clarification"]
+    description: "Simple hotel search in Guilin with location preference for hotels near the river."
+  T1_013:
+    level: "T1"
+    query: "What’s the weather forecast for tomorrow in Nanjing"
+    expected_subagents: ["weather_forecast_check"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives Nanjing weather for tomorrow"]
+    system_side_milestones: ["Called weather_forecast_check for Nanjing tomorrow"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple weather forecast query for Nanjing for tomorrow."
+  T1_014:
+    level: "T1"
+    query: "List the opening hours of the Shanghai Museum"
+    expected_subagents: ["travel_planning"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives Shanghai Museum opening hours"]
+    system_side_milestones: ["Called travel_planning to retrieve the operating hours"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Retrieve and display the opening hours of the Shanghai Museum."
+  T1_015:
+    level: "T1"
+    query: "Find restaurants near West Lake, Hangzhou"
+    expected_subagents: ["restaurant_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives list of restaurants near West Lake, Hangzhou"]
+    system_side_milestones: ["Called restaurant_recommendation to recommend  restaurants"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple restaurant search near West Lake, Hangzhou"
+  T1_016:
+    level: "T1"
+    query: "Search for transportation options from Guangzhou to Wuhan"
+    expected_subagents: ["flight_search"]
+    expected_clarifications: []
+    user_side_milestones: ["User received flight information for the Guangzhou to Wuhan route."]
+    system_side_milestones: ["Called flight_search check flight"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Query available high-speed trains from Guangzhou to Wuhan."
+  T1_017:
+    level: "T1"
+    query: "Check air quality in Xi’an this week"
+    expected_subagents: ["weather_forecast_check"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives air quality info for Xi'an this week"]
+    system_side_milestones: ["Called weather_forecast_check info the weather"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Query: Retrieve air quality information for Xi'an for the current week."
+  T1_018:
+    level: "T1"
+    query: "Check the flight schedule from Shanghai to Beijing"
+    expected_subagents: ["flight_search"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives flight schedule Shanghai to Beijing"]
+    system_side_milestones: ["Called flight_search check flight"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Check train schedule from Shanghai to Hangzhou."
+  T1_019:
+    level: "T1"
+    query: "Find the best seafood restaurants in Qingdao"
+    expected_subagents: ["restaurant_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives list of top seafood restaurants in Qingdao"]
+    system_side_milestones: ["Called restaurant_recommendation to recommend restaurants"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple restaurant search for best seafood restaurants in Qingdao."
+  T1_020:
+    level: "T1"
+    query: "What’s the weather like in Harbin this weekend"
+    expected_subagents: ["weather_forecast_check"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives Harbin weekend weather"]
+    system_side_milestones: ["Called weather_forecast_check for weather"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple weather query for Harbin for the upcoming weekend."
+  T1_021:
+    level: "T1"
+    query: "Find museums in Beijing"
+    expected_subagents: ["travel_planning"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives museum list"]
+    system_side_milestones: ["Called travel_planning find museums"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Query: Provide a list of top-rated museums in Beijing."
+  T1_022:
+    level: "T1"
+    query: "Search for budget hotels in Xi’an city center"
+    expected_subagents: ["hotel_accommodation_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives list of budget hotels in Xi’an city center"]
+    system_side_milestones: ["Called hotel_accommodation_recommendation find hotel"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Simple Task: Search and recommend budget hotels in Xi’an city center."
+  T1_023:
+    level: "T1"
+    query: "Check flight ticket to XiAn, then find hotel check-in time and transfer options"
+    expected_subagents: ["flight_search","hotel_accommodation_recommendation","travel_planning"]
+    expected_clarifications: []
+    user_side_milestones: ["User received the flight schedule for Xi'an.","User has received the hotel check-in schedule.","User received the transfer instructions."]
+    system_side_milestones: ["Called flight_search find flight","Called hotel_accommodation_recommendation find hotel","Called travel_planning recommended transportation options"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Automatically inferred task from query: Check flight ticket to XiAn, then find hotel check-in time and transfer options"
+  T1_024:
+    level: "T1"
+    query: "cheap flights south china good weather restaurant suggestion"
+    expected_subagents: ["flight_search","weather_forecast_check","restaurant_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives cheap South China flights","User receives weather information","User receives restaurant recommendation list"]
+    system_side_milestones: ["Called flight_search for cheap flights", "Called weather_forecast_check for good weather",  "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Automatically inferred task from query: cheap flights south china good weather restaurant suggestion"
+  T1_025:
+    level: "T1"
+    query: "Check tomorrow’s weather in Hangzhou, then recommend a walking route around West Lake and a lunch spot"
+    expected_subagents: ["weather_forecast_check","travel_planning","restaurant_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives tomorrow’s weather information in Hangzhou","User receives a recommended walking route around West Lake","Users receive a list of recommended lunch restaurants."]
+    system_side_milestones: ["Called weather_forecast_check for weather info","Called travel_planning route inquiry","Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Automatically inferred task from query: Check tomorrow’s weather in Hangzhou, then recommend a walking route around West Lake and a lunch spot"
+  T1_026:
+    level: "T1"
+    query: "I want a 3-day relaxing trip to Hangzhou. Help me plan the itinerary, including flights, hotel options near West Lake, weather forecast, recommended restaurants, and the best walking routes between attractions."
+    expected_subagents: ["travel_planning","flight_search","hotel_accommodation_recommendation","weather_forecast_check","restaurant_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User received flight recommendations for a three-day trip to Hangzhou.","User receives the weather conditions in Hangzhou.","User receives hotel options near West Lake in Hangzhou","User received the list of restaurants in Hangzhou.","User receives walking routes between attractions in Hangzhou"]
+    system_side_milestones: ["Called travel_planning recommended sightseeing routes","Called flight_search recommended  find flight","Called hotel_accommodation_recommendation search for hotels","Called weather_forecast_check for weather info","Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Automatically inferred task from query: I want a 3-day relaxing trip to Hangzhou. Help me plan the itinerary, including flights or trains, hotel options near West Lake, weather forecast, recommended restaurants, and the best walking routes between attractions."
+  T1_027:
+    level: "T1"
+    query: "I want to go somewhere interesting soon, maybe relax or try something new. What do you suggest?"
+    expected_subagents: ["travel_planning"]
+    expected_clarifications: []
+    user_side_milestones: ["User received travel itinerary planning information"]
+    system_side_milestones: ["Called travel_planning provide travel itineraries"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Automatically inferred task from query: I want to go somewhere interesting soon, maybe relax or try something new. What do you suggest?"
+  T1_028:
+    level: "T1"
+    query: "I want to go on a short trip but I only know I want good food and not too hot weather. Maybe also help see how to get there?"
+    expected_subagents: ["travel_planning","restaurant_recommendation","weather_forecast_check"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives recommendations for the short trip","User receives good food recommendations for the short trip","User receives weather information for areas that are not too hot."]
+    system_side_milestones: ["Called travel_planning recommended travel routes","Called restaurant_recommendation find restaurant","Called weather_forecast_check for weather info"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Automatically inferred task from query: I want to go on a short trip but I only know I want good food and not too hot weather. Maybe also help see how to get there?"
+  T1_029:
+    level: "T1"
+    query: "I want to visit a city with good food."
+    expected_subagents: ["travel_planning","restaurant_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives travel itinerary","User receives restaurant recommendations list"]
+    system_side_milestones: ["Called travel_planning recommended travel routes","Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["single_intent", "direct_execution"]
+    description: "Automatically inferred task from query: I want to visit a city with good food."
+  T2_001:
+    level: "T2"
+    query: "Check the weather in Chongqing, then recommend suitable outdoor activities pls"
+    expected_subagents: ["weather_forecast_check"]
+    expected_clarifications: ["outdoor_activity_preferences", "target_date"]
+    user_side_milestones: ["User receives Chongqing weather","User receives outdoor activity recommendations"]
+    system_side_milestones: ["Called weather_forecast_check for weather info"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check Chongqing weather, then recommend suitable outdoor activities based on result."
+  T2_002:
+    level: "T2"
+    query: "Find the airport in Chongqing, then search nearby hotels and estimate walking time"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation"]
+    expected_clarifications: ["hotel_distance_preference", "travel_date"]
+    user_side_milestones: ["User receives flight arrival information in Chongqing", "User receives airport nearby hotel list"]
+    system_side_milestones: ["Called flight_search find flight", "Called hotel_accommodation_recommendation search hotels"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Locate Chongqing airport, recommend nearby hotels, and estimate walking times."
+  T2_003:
+    level: "T2"
+    query: "Recommend the flight ticket to Sanya based on the weather condition recently"
+    expected_subagents: ["weather_forecast_check", "flight_search"]
+    expected_clarifications: ["departure_city", "travel_date"]
+    user_side_milestones: ["User receives Sanya weather update", "User receives recommended flight to Sanya"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called flight_search find flight"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check recent Sanya weather and recommend a flight accordingly."
+  T2_004:
+    level: "T2"
+    query: "Check the weather in Beijing, then suggest nearby attractions and a good lunch spot"
+    expected_subagents: ["weather_forecast_check", "travel_planning", "restaurant_recommendation"]
+    expected_clarifications: ["travel_date", "lunch_time_preference"]
+    user_side_milestones: ["User receives Beijing weather forecast", "User gets nearby attractions suggestions", "User receives lunch spot recommendation"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called travel_planning for attractions info", "Called restaurant_recommendation search for restaurants"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check weather in Beijing, then suggest nearby attractions and a lunch spot"
+  T2_005:
+    level: "T2"
+    query: "Find flights from Shanghai to Chengdu, then recommend a hotel near downtown"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation"]
+    expected_clarifications: ["travel_date"]
+    user_side_milestones: ["User receives Shanghai to Chengdu flights", "User receives a list of hotels near downtown Chengdu."]
+    system_side_milestones: ["Called flight_search check flight", "Called hotel_accommodation_recommendation search for hotels"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Search flights from Shanghai to Chengdu, recommend downtown hotels, and estimate taxi time from airport to downtown."
+  T2_006:
+    level: "T2"
+    query: "Check the flight schedule from Tianjin to Xiamen, then find hotels near the airport and recommend dinner spots."
+    expected_subagents: ["flight_search","hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["travel_date"]
+    user_side_milestones: ["User receives flight schedules Nanjing to Suzhou", "User receives airport nearby hotel options", "User receives dinner restaurant recommendations"]
+    system_side_milestones: ["Called flight_search flight inquiry", "Called hotel_accommodation_recommendation search for hotels", "Called restaurant_recommendation search for restaurants"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Lookup train schedules, then recommend nearby hotels and dinner restaurants in Suzhou."
+  T2_007:
+    level: "T2"
+    query: "Check air quality in Guangzhou, then suggest outdoor activities and a nearby restaurant"
+    expected_subagents: ["weather_forecast_check", "restaurant_recommendation"]
+    expected_clarifications: ["activity_date"]
+    user_side_milestones: ["User receives air quality info", "User receives nearby restaurants list"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called restaurant_recommendation search restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check Guangzhou air quality, suggest outdoor activities, then recommend a nearby café."
+  T2_008:
+    level: "T2"
+    query: "Search flights to Xi’an, then find a hotel near the city wall and recommend a local restaurant"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["departure_city", "travel_date"]
+    user_side_milestones: ["User notified of flights to Xi’an", "User receives hotels near city wall", "User receives local restaurant recommendations"]
+    system_side_milestones: ["Called flight_search to query flights", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Search flights to Xi’an, then find hotel near city wall and recommend a local restaurant"
+  T2_009:
+    level: "T2"
+    query: "Find available flights from Wuhan to Huizhou, then suggest accommodation and dinner options in Huizhou"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["travel_date"]
+    user_side_milestones: ["User receives flight options Wuhan to Huizhou","User receives list of recommended hotels in Huizhou","User receives dinner recommendations in Huizhou"]
+    system_side_milestones: ["Called travel_planning to find flight ", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Find available flights from Wuhan to Huizhou, then suggest accommodation and dinner options in Huizhou"
+  T2_010:
+    level: "T2"
+    query: "Check the weekend weather in Guilin, then suggest a one-day itinerary and top-rated restaurants"
+    expected_subagents: ["weather_forecast_check", "travel_planning", "restaurant_recommendation"]
+    expected_clarifications: ["which_weekend", "date_of_travel"]
+    user_side_milestones: ["User receives Guilin weekend weather info", "User receives 1-day Guilin itinerary", "User receives top Guilin restaurants"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called travel_planning provide itinerary arrangements", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check Guilin weekend weather, then provide a one-day itinerary and top-rated restaurant recommendations."
+  T2_011:
+    level: "T2"
+    query: "Look for flights from Wuhan to Sanya, then find a beachfront hotel and recommend evening activities"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "travel_planning"]
+    expected_clarifications: ["travel_date"]
+    user_side_milestones: ["User receives flight options Wuhan to Sanya", "User receives beachfront hotel recommendations", "User receives evening activity suggestions"]
+    system_side_milestones: ["Called flight_search to find flight", "Called hotel_accommodation_recommendation find hotel", "Called travel_planning arrange activities"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Search for flights from Wuhan to Sanya, recommend beachfront hotels, and suggest evening activities in order."
+  T2_012:
+    level: "T2"
+    query: "Check current weather in Chongqing, then recommend a sightseeing route and a local hotpot restaurant"
+    expected_subagents: ["weather_forecast_check", "travel_planning", "restaurant_recommendation"]
+    expected_clarifications: []
+    user_side_milestones: ["User receives Chongqing weather info", "User receives sightseeing route", "User receives hotpot restaurant list"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called travel_planning provide itinerary", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency"]
+    description: "<Sequential Task: Check Chongqing weather, then recommend sightseeing route and hotpot restaurant>"
+  T2_013:
+    level: "T2"
+    query: "Check the weather in Suzhou, then suggest a walking route"
+    expected_subagents: ["weather_forecast_check", "travel_planning"]
+    expected_clarifications: ["walk_start_location", "walk_end_location", "walk_date", "tea_house_preference"]
+    user_side_milestones: ["User notified of Suzhou weather", "User notified walking route suggested"]
+    system_side_milestones: ["Called weather_forecast_check for for weather info", "Called travel_planning provide walking route"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check the weather in Suzhou, then suggest a walking route"
+  T2_014:
+    level: "T2"
+    query: "Find flights from Chengdu to Kunming, then recommend a hotel"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation"]
+    expected_clarifications: ["travel_date"]
+    user_side_milestones: ["User notified of flights from Chengdu to Kunming", "User receives hotel recommendations in Kunming"]
+    system_side_milestones: ["Called flight_search to query flights", "Called hotel_accommodation_recommendation find hotel"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Find flights from Chengdu to Kunming, then recommend a hotel"
+  T2_015:
+    level: "T2"
+    query: "Look up flights options from Wuhan to Beijing, then suggest lunch spots and hotel options"
+    expected_subagents: ["flight_search","restaurant_recommendation", "hotel_accommodation_recommendation"]
+    expected_clarifications: ["travel_date", "lunch_preference", "hotel_preference"]
+    user_side_milestones: ["User receives flight options from Wuhan to Changsha", "User receives lunch spot suggestions", "User receives hotel recommendations list"]
+    system_side_milestones: ["Called flight_search to query flights", "Called restaurant_recommendation find restaurant", "Called hotel_accommodation_recommendation find hotel"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Look up flights options from Wuhan to Beijing, then suggest lunch spots and hotel options"
+  T2_016:
+    level: "T2"
+    query: "Check tomorrow’s air quality in Hangzhou, then recommend local restaurants"
+    expected_subagents: ["weather_forecast_check", "restaurant_recommendation"]
+    expected_clarifications: ["outdoor_activity_preference", "restaurant_cuisine_preference", "restaurant_budget"]
+    user_side_milestones: ["User receives Hangzhou air quality for tomorrow", "User receives local restaurant recommendations"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check tomorrow’s air quality in Hangzhou, then recommend local restaurants"
+  T2_017:
+    level: "T2"
+    query: "Search flights to Nanjing, then find a centrally located hotel and suggest sightseeing routes"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "travel_planning"]
+    expected_clarifications: ["departure_city", "travel_date"]
+    user_side_milestones: ["User receives flights to Nanjing", "User receives central hotel options", "User receives sightseeing route"]
+    system_side_milestones: ["Called flight_search for flights", "Called hotel_accommodation_recommendation find hotel", "Called travel_planning for sightseeing route"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Search flights to Nanjing, recommend a centrally located hotel, and suggest sightseeing routes in order."
+  T2_018:
+    level: "T2"
+    query: "Help me book a hotel and find food places."
+    expected_subagents: ["hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["destination_city", "check_in_date", "check_out_date", "cuisine_preference", "budget_preference"]
+    user_side_milestones: ["User receives hotel options", "User receives restaurant list"]
+    system_side_milestones: ["Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation to find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification", "requires_clarification"]
+    description: "Sequential Task: Recommend hotels and nearby restaurants, may need clarification on location and dates."
+  T2_019:
+    level: "T2"
+    query: "Show me 3 cities based on good weather, then I’ll pick one and you plan flights + hotel."
+    expected_subagents: ["weather_forecast_check", "flight_search", "hotel_accommodation_recommendation"]
+    expected_clarifications: ["weather_date_range", "departure_city", "number_of_travelers", "travel_budget"]
+    user_side_milestones: ["User receives 3 cities with good weather", "User receives flight options", "User receives hotel recommendations list"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called flight_search find flight", "Called hotel_accommodation_recommendation find hotel"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification", "requires_clarification"]
+    description: "Sequential Task: Recommend 3 cities with good weather, then plan flights and hotels for the user's selected city."
+  T2_020:
+    level: "T2"
+    query: "Recommend hotel options, then I'll choose and you find restaurants around it."
+    expected_subagents: ["hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["hotel_location", "check_in_date", "check_out_date", "cuisine_preference", "number_of_guests"]
+    user_side_milestones: ["User receives hotel list", "User receives restaurant list near hotel"]
+    system_side_milestones: ["Called hotel_accommodation_recommendation find hotel",  "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification", "requires_clarification"]
+    description: "Sequential Task: Recommend hotels, await user selection, then suggest nearby restaurants."
+  T2_021:
+    level: "T2"
+    query: "First check which day has better weather, then plan an itinerary for that day."
+    expected_subagents: ["weather_forecast_check", "travel_planning"]
+    expected_clarifications: ["which_days_to_compare", "destination_location"]
+    user_side_milestones: ["User notified of better weather day", "User receives itinerary for selected day"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called travel_planning for selected day"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check weather for multiple days, then plan itinerary for the day with better weather."
+  T2_022:
+    level: "T2"
+    query: "Recommend dinner options first, then plan a route including them."
+    expected_subagents: ["restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["dinner_location", "dining_preferences", "route_start_point", "route_end_point"]
+    user_side_milestones: ["User receives dinner options", "User receives planned route including dinner spots"]
+    system_side_milestones: ["Called restaurant_recommendation find restaurant", "Called travel_planning to generate route"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Recommend dinner options, then plan a route including them."
+  T2_023:
+    level: "T2"
+    query: "Check flight ticket to XiAn, then find hotel check-in time and transfer options"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "travel_planning"]
+    expected_clarifications: ["departure_city", "travel_date"]
+    user_side_milestones: ["User receives XiAn flight options", "User receives hotel check-in info", "User receives transfer options"]
+    system_side_milestones: ["Called flight_search for XiAn flights", "Called hotel_accommodation_recommendation for check-in times", "Called travel_planning to find the route"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Query flight to XiAn, check hotel check-in time, and find transfer options in order."
+  T2_024:
+    level: "T2"
+    query: "Check tomorrow’s weather in Hangzhou, then recommend a walking route around West Lake and a lunch spot"
+    expected_subagents: ["weather_forecast_check", "travel_planning", "restaurant_recommendation"]
+    expected_clarifications: ["walking_difficulty_preference", "lunch_cuisine_preference", "lunch_budget"]
+    user_side_milestones: ["User receives weather forecast for Hangzhou", "User receives walking route around West Lake", "User receives lunch spot recommendation"]
+    system_side_milestones: ["Called weather_forecast_check for weather info", "Called travel_planning for West Lake walking route", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["sequential_execution", "data_dependency", "may_require_date_clarification"]
+    description: "Sequential Task: Check Hangzhou weather, recommend West Lake walking route, suggest lunch spot"
+  T3_001:
+    level: "T3"
+    query: "Shanghai weekend plan at a downtown hotel and enjoy a local specialty dinner."
+    expected_subagents: ["hotel_accommodation_recommendation", "restaurant_recommendation",]
+    expected_clarifications: ["exact_travel_dates", "budget_preference", "hotel_preference", "cuisine_preference", "departure_city", "number_of_travelers", "route_priority"]
+    user_side_milestones: ["User receives list of downtown hotels", "User receives local dinner restaurant list"]
+    system_side_milestones: ["Called hotel_accommodation_recommendation find hotel","Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "sequential_execution", "data_dependency", "multi_objective_optimization"]
+    description: "<Complex planning task: Shanghai weekend plan at a downtown hotel and enjoy a local specialty dinner. Multiple constraints and agent coordination required.>"
+  T3_002:
+    level: "T3"
+    query: "chengdu trip hotpot where stay flight info rain?"
+    expected_subagents: ["flight_search","travel_planning", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check"]
+    expected_clarifications: ["travel_date", "return_date", "departure_city", "budget", "hotpot_preference", "accommodation_type", "number_of_travelers"]
+    user_side_milestones: ["User receives flight options to Chengdu", "User receives travel itinerary planning","User receives hotpot restaurant recommendations", "User receives accommodation options", "User receives Chengdu weather update"]
+    system_side_milestones: ["Called flight_search to query flights", "Called travel_planning recommended travel routes","Called restaurant_recommendation find restaurant", "Called hotel_accommodation_recommendation find hotel", "Called weather_forecast_check for weather info"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "data_dependency", "multi_objective_optimization", "sequential_execution"]
+    description: "Complex trip planning for Chengdu involving flight search, hotpot restaurant recommendations, accommodation selection, and weather forecast with rain check."
+  T3_003:
+    level: "T3"
+    query: "hangzhou west lake travel plan hotel near lake food map"
+    expected_subagents: ["travel_planning", "hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["travel_date", "number_of_travelers", "budget", "dietary_preferences", "length_of_stay"]
+    user_side_milestones: ["User receives West Lake travel plan", "User receives hotels near lake", "User receives food map"]
+    system_side_milestones: ["Called travel_planning recommended itinerary", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "sequential_execution", "data_dependency"]
+    description: "Complex planning task: Generate a Hangzhou West Lake travel itinerary, recommend hotels near the lake, and provide a map of local food options."
+  T3_004:
+    level: "T3"
+    query: "Search for flights for next month's trip, stay at a local boutique guesthouse, and recommendations for movies currently showing."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "movie_recommendation"]
+    expected_clarifications: ["exact_travel_dates", "destination", "budget_preferences", "hotel_preferences", "movie_genre_preferences", "number_of_travelers"]
+    user_side_milestones: ["User receives flight information for next month", "User gets recommended homestays list", "User gets movie recommendations"]
+    system_side_milestones: ["Called flight_search to query flights", "Called hotel_accommodation_recommendation for hotels", "Called movie_recommendation for movies"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "sequential_execution", "data_dependency"]
+    description: "Complex planning task: Generate a travel plan for next month including weather check, hotel and movie recommendations."
+  T3_005:
+    level: "T3"
+    query: "Plan a 5-day vacation to XinJiang for two people next month with a total budget of $3,000. We want direct flights, a centrally located hotel or short-term rental with a rating above 8, and easy access to public transport. Prefer local cuisine restaurants, but include at least one Michelin-starred option. Optimize for convenience, comfort, and cost."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["exact_travel_dates", "preferred_departure_city", "preferred_airport", "specific_cities_in_XinJiang", "dietary_restrictions"]
+    user_side_milestones: ["User receives optimized 5-day itinerary", "User receives list of direct flights to xinjiang", "User receives hotel/rental recommendations (rating >8, central, near public transport)", "User receives local restaurant list incl and Michelin option"]
+    system_side_milestones: ["Called flight_search for direct flights within budget", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation for local restaurants", "Called travel_planning to generate optimized itinerary"]
+    complexity_factors: ["multi_objective_optimization", "requires_clarification", "sequential_execution", "data_dependency", "multi_agent_coordination"]
+    description: "Complex planning task: Plan a budget-constrained, convenience-optimized 5-day XinJiang trip for two with direct flights, high-rated central lodging, and dining preferences."
+  T3_006:
+    level: "T3"
+    query: "I want to plan a 5-day vacation to Sichuan Province next month with a total budget of $5000, focusing on cultural experiences and local cuisine. I need recommendations for flights, hotels, and restaurants, as well as a feasible itinerary that minimizes travel time between locations. I prefer staying near major attractions, require at least one vegetarian restaurant per day, and want options for both luxury and budget accommodations to compare. Please help me optimize my schedule and costs, considering my preferences."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["exact_travel_date_range", "preferred_departure_city", "number_of_travelers", "luxury_budget_accommodation_ratio", "specific_cultural_interests", "dietary_restrictions_detail"]
+    user_side_milestones: ["User receives optimized itinerary", "User gets flight to sichuan options with prices", "User receives hotel recommendations (luxury & budget)", "User notified of daily vegetarian restaurant options", "User sees cost comparison summary"]
+    system_side_milestones: ["Called travel_planning for cultural itinerary", "Called flight_search for flight options", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "data_dependency", "sequential_execution", "dependency_handling", "family_member_constraints"]
+    description: "Complex planning task: Optimize and coordinate a multi-agent travel plan for a 5-day cultural and culinary vacation in Sichuan, considering budget, travel time, accommodation preferences, daily vegetarian options, and itinerary optimization."
+  T3_007:
+    level: "T3"
+    query: "I want to plan a week-long vacation to Yunnan for two people, including flights, hotels, and restaurants. The trip should start within the next two months, and my total budget is $4,000. I prefer staying in centrally located hotels with good reviews and would like to try authentic Italian cuisine. Please optimize for cost, convenience, and experience"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["departure_city", "exact_travel_dates", "preferred_airport", "dietary_restrictions", "convenience_preference_weight", "cost_experience_tradeoff"]
+    user_side_milestones: ["User receives optimized itinerary", "User sees flight to Yunnan within budget", "User gets hotel recommendations (central, good reviews)", "User receives Italian restaurant suggestions", "User notified total cost fits $4,000 budget"]
+    system_side_milestones: ["Called travel_planning to generate itinerary", "Called flight_search to find flights", "Called hotel_accommodation_recommendation for central hotels", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["multi_objective_optimization", "multi_agent_coordination", "requires_clarification", "family_member_constraints", "data_dependency", "sequential_execution"]
+    description: "Complex Planning Task: Plan and optimize a week-long Yunnan trip for two, including flights, hotels, restaurants, under $4,000, considering convenience and experience."
+  T3_008:
+    level: "T3"
+    query: "Plan a 7-day trip to Yunnan for two adults and one child with a total budget of ¥15,000, including flights, hotels near major attractions, and local restaurant recommendations. Optimize for comfort and convenience."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["travel_dates", "preferred_departure_city", "child_age", "comfort_preferences", "major_attractions_of_interest", "dietary_restrictions"]
+    user_side_milestones: ["User receives optimized Yunnan itinerary", "User notified of flight to yunnan", "User receives hotel recommendations near attractions", "User gets local restaurant suggestions"]
+    system_side_milestones: ["Called travel_planning to itinerary", "Called flight_search find flight ", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation for local restaurants"]
+    complexity_factors: ["multi_objective_optimization", "multi_agent_coordination", "family_member_constraints", "requires_clarification", "data_dependency"]
+    description: "Complex planning task: Plan a 7-day Yunnan trip for a family (two adults, one child), managing a total budget of ¥15,000, optimizing for comfort and convenience, including flights, hotels near attractions, and restaurant recommendations."
+  T3_009:
+    level: "T3"
+    query: "I want to plan a two-week vacation to Guilin in September with a total budget of $5,000 for two people. We prefer direct flights, centrally located hotels with good reviews. Be sure to balance cost, convenience, and cultural experience"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "travel_planning"]
+    expected_clarifications: ["exact_travel_dates", "preferred_airport_departure", "cultural_preferences", "dietary_restrictions"]
+    user_side_milestones: ["User receives vacation itinerary", "User receives direct flight to Guilin", "User receives hotel recommendations", "User notified of cost breakdown"]
+    system_side_milestones: ["Called flight_search for direct flights", "Called hotel_accommodation_recommendation for central hotels", "Called travel_planning for itinerary"]
+    complexity_factors: ["multi_objective_optimization", "requires_clarification", "multi_agent_coordination", "data_dependency", "dependency_handling"]
+    description: "Complex vacation planning with constraints: budget, flight preferences, hotel location/reviews, and the need to balance cost, convenience, and cultural experience."
+  T3_010:
+    level: "T3"
+    query: "I’m planning a short trip to Shanghai next month. Can you help me check the flights, estimate the weather for those days, book a hotel near the Bund, and also suggest some good local restaurants and evening activities?"
+    expected_subagents: ["flight_search", "weather_forecast_check", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["exact_travel_dates", "number_of_travelers", "desired_flight_times", "hotel_checkin_checkout_dates", "hotel_room_type", "restaurant_cuisine_preferences", "preferred_evening_activities"]
+    user_side_milestones: ["User receives flight to shanxi", "User notified of Shanghai weather", "User receives hotel recommendations near the Bund", "User receives restaurant suggestions", "User receives evening activity suggestions"]
+    system_side_milestones: ["Called flight_search to check flights", "Called weather_forecast_check for weather info", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation for local restaurants", "Called travel_planning for evening activities"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "multi_objective_optimization", "data_dependency", "sequential_execution"]
+    description: "<Complex Planning Task: Organize a short trip to Shanghai involving flight search, weather check, hotel booking near the Bund, local restaurant recommendations, and suggestions for evening activities, with multiple constraints and clarifications required.>"
+  T3_011:
+    level: "T3"
+    query: "I want to plan a weekend getaway to Chengdu. Please find available flights from my city, recommend a comfortable hotel, check the weather, and propose a short itinerary including food, attractions, and a movie option for one evening."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "travel_planning", "restaurant_recommendation", "movie_recommendation"]
+    expected_clarifications: ["departure_city", "travel_dates", "hotel_preferences", "movie_genre_preferences", "food_preferences", "number_of_travelers"]
+    user_side_milestones: ["User receives flight to chengdu", "User receives hotel recommendations", "User receives Chengdu weather forecast", "User receives itinerary with attractions and food", "User receives movie option for one evening"]
+    system_side_milestones: ["Called flight_search for flights to Chengdu", "Called hotel_accommodation_recommendation find hotel", "Called weather_forecast_check for weather info", "Called travel_planning for Chengdu itinerary", "Called restaurant_recommendation find restaurant", "Called movie_recommendation for movie options"]
+    complexity_factors: ["multi_agent_coordination", "sequential_execution", "data_dependency", "multi_objective_optimization", "requires_clarification"]
+    description: "Complex planning task: Plan a weekend getaway to Chengdu with coordinated flights, hotel, weather, food, attractions, and a movie option."
+  T3_012:
+    level: "T3"
+    query: "I’ll be traveling to Guangzhou soon. Please confirm the weather for the expected travel dates, look for flights, recommend a hotel close to public transport, and then suggest places to have Cantonese breakfast and dinner."
+    expected_subagents: ["weather_forecast_check", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["travel_date", "departure_city", "number_of_travelers", "hotel_checkin_checkout_dates", "budget_preference"]
+    user_side_milestones: ["User receives Guangzhou weather info", "User gets flight options to Guangzhou", "User gets hotel recommendations near public transport", "User receives Cantonese breakfast and dinner suggestions"]
+    system_side_milestones: ["Called weather_forecast_check for weather onfo", "Called flight_search for flights to Guangzhou", "Called hotel_accommodation_recommendation find hotel", "Called restaurant_recommendation find restaurant"]
+    complexity_factors: ["multi_agent_coordination", "data_dependency", "requires_clarification", "sequential_execution", "multi_objective_optimization"]
+    description: "Complex travel planning task: Check Guangzhou weather for travel dates, find flights, recommend public transport-accessible hotels, and suggest Cantonese breakfast and dinner spots."
+  T3_013:
+    level: "T3"
+    query: "I'm thinking about traveling to Sanya for a beach vacation. Can you check flights, find a beachfront hotel, tell me what the weather will likely be, and recommend dinner spots and evening entertainment?"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["travel_date", "return_date", "departure_city", "hotel_check_in_date", "hotel_check_out_date", "preferred_cuisine", "entertainment_preferences", "budget_constraints", "number_of_travelers"]
+    user_side_milestones: ["User receives flights to Sanya", "User receives beachfront hotel options", "User informed about Sanya weather", "User receives dinner spot recommendations", "User receives evening entertainment suggestions"]
+    system_side_milestones: ["Called flight_search to query flights", "Called hotel_accommodation_recommendation for beachfront hotels", "Called weather_forecast_check for weather info", "Called restaurant_recommendation find restaurant", "Called travel_planning for evening entertainment"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "dependency_handling"]
+    description: "Complex travel planning task: Check flights, find beachfront hotels, check weather, and recommend dining and entertainment for a beach vacation to Sanya with multiple constraints and agent coordination."
+  T3_014:
+    level: "T3"
+    query: "Help me organize a multi-city trip: Shanghai → dali → haerbin. Find the best route order, transportation between cities, hotels in each city, weather checks, and recommended restaurants I shouldn’t miss."
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation"]
+    expected_clarifications: ["travel_dates", "number_of_travelers", "budget_constraints", "stay_duration_per_city", "transportation_preferences", "dietary_preferences"]
+    user_side_milestones: ["User receives optimized city visit order", "User is recommended hotels for each city", "User receives weather summary per city", "User receives must-try restaurants","User recevices flight info"]
+    system_side_milestones: ["Called travel_planning for route optimization", "Called flight_search for city connections", "Called hotel_accommodation_recommendation find hotel", "Checked weather_forecast_check for weather info", "Called restaurant_recommendation for each city"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "sequential_execution", "data_dependency", "requires_clarification", "dependency_handling"]
+    description: "Complex multi-city trip planning: optimize route order, provide transportation options, recommend hotels, check weather, and suggest must-try restaurants for Shanghai, dali, and haerbin."
+  T3_015:
+    level: "T3"
+    query: "I need help planning a surprise 2-day trip for a friend: choose a destination with good weather, find a nice hotel, plan meals, find a movie we can watch together, and suggest a scenic route for a morning walk."
+    expected_subagents: ["weather_forecast_check", "travel_planning", "hotel_accommodation_recommendation", "restaurant_recommendation", "movie_recommendation"]
+    expected_clarifications: ["trip_dates", "friend_preferences", "departure_location", "budget_range", "movie_genre_preferences", "dietary_preferences"]
+    user_side_milestones: ["User receives destination with good weather", "User receives hotel options", "User receives meal suggestions", "User receives movie recommendation", "User receives scenic morning walk route"]
+    system_side_milestones: ["Called weather_forecast_check for reliable weather cities","Called travel_planning to shortlist destinations and routes", "Called hotel_accommodation_recommendation for hotels", "Called restaurant_recommendation for meals", "Called movie_recommendation for movie options"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "data_dependency", "sequential_execution"]
+    description: "Complex planning task: Plan a surprise 2-day trip including destination selection with good weather, hotel, meals, a movie, and a scenic morning walk."
+  T3_016:
+    level: "T3"
+    query: "Help me plan a “work + travel” hybrid trip. I need a city with reliable weather, good hotel workspaces, convenient transport, restaurant recommendations, and also some leisure activities like movies or sightseeing."
+    expected_subagents: ["weather_forecast_check", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning", "movie_recommendation"]
+    expected_clarifications: ["travel_dates", "preferred_cities_or_regions", "budget_constraints", "workspace_requirements", "leisure_activity_preferences", "number_of_travelers"]
+    user_side_milestones: ["User recevices weather info", "User provided hotel workspace list", "User receives restaurant recommendations", "User receives leisure activity options"]
+    system_side_milestones: ["Called flight_search for flights to work city","Called weather_forecast_check for reliable weather cities", "Called hotel_accommodation_recommendation for workspace hotels", "Called restaurant_recommendation for local dining", "Called travel_planning for sightseeing suggestions", "Called movie_recommendation for local movies"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "multi_objective_optimization", "dependency_handling"]
+    description: "Complex planning task: Recommend a city and plan a hybrid work and travel trip coordinating weather, workspace hotels, transport, restaurants, and leisure activities with multiple constraints."
+  T3_017:
+    level: "T3"
+    query: "Help me plan a visit to Xian: I want flight info, a hotel near the city wall, weather for that period, recommended restaurants, and the best route to visit the Terracotta Army efficiently."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["travel_date", "number_of_travelers", "departure_city", "duration_of_stay", "cuisine_preference", "budget_preference"]
+    user_side_milestones: ["User receives flights to Xian", "User receives hotel options near city wall", "User receives weather forecast for travel period", "User receives recommended restaurants in Xian", "User receives best route to Terracotta Army"]
+    system_side_milestones: ["Called flight_search for flights to Xian", "Called hotel_accommodation_recommendation for hotels near city wall", "Called weather_forecast_check for Xian travel dates", "Called restaurant_recommendation for Xian restaurants", "Called travel_planning for Terracotta Army route"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "sequential_execution", "data_dependency", "requires_clarification"]
+    description: "Complex multi-agent trip planning for a visit to Xian, covering flights, hotel, weather, restaurants, and efficient sightseeing route, with several missing details requiring clarification."
+  T3_018:
+    level: "T3"
+    query: "I want to do a slow travel experience in Xiamen: check the weather, find flight tickets, choose a peaceful hotel, recommend local snacks, plan a bike-friendly route, and suggest a movie for the last night."
+    expected_subagents: ["weather_forecast_check", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning", "movie_recommendation"]
+    expected_clarifications: ["travel_dates", "departure_city", "hotel_peacefulness_criteria", "bike_route_preferences", "movie_genre_preference"]
+    user_side_milestones: ["User receives Xiamen weather info", "User receives flights to Xiamen", "User receives peaceful hotel options", "User receives local snack recommendations", "User receives bike-friendly route plan", "User receives movie suggestion"]
+    system_side_milestones: ["Called weather_forecast_check for Xiamen weather", "Called flight_search for flights to Xiamen", "Called hotel_accommodation_recommendation for peaceful hotels", "Called restaurant_recommendation for local snacks", "Called travel_planning to plan bike-friendly route", "Called movie_recommendation for final night movie"]
+    complexity_factors: ["multi_agent_coordination", "sequential_execution", "multi_objective_optimization", "data_dependency", "requires_clarification", "dependency_handling"]
+    description: "Complex multi-agent planning task for a slow travel experience in Xiamen, including weather check, flights, peaceful accommodation, local snacks, bike route, and a movie recommendation for the last night."
+  T3_019:
+    level: "T3"
+    query: "Plan a 4-day route covering Shanghai → beijing → wulumuqi including hotels, weather, and transportation."
+    expected_subagents: ["travel_planning", "hotel_accommodation_recommendation", "weather_forecast_check", "flight_search"]
+    expected_clarifications: ["travel_start_date", "hotel_preferences", "transportation_mode", "budget_constraints"]
+    user_side_milestones: ["User receives 4-day itinerary", "User receives hotel info for each city", "User receives weather info for travel dates","User receives "]
+    system_side_milestones: ["Called travel_planning to generate route", "Called hotel_accommodation_recommendation for each city", "Called weather_forecast_check for each city and date", "Called flight_search or other transport for intercity travel"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "sequential_execution", "data_dependency", "dependency_handling"]
+    description: "Complex multi-city travel plan requiring hotels, weather updates, and transportation coordination for a 4-day Shanghai → bejing → wulumuqi route."
+  T3_020:
+    level: "T3"
+    query: "Help me design a multi-city trip in south China based on weather and flights."
+    expected_subagents: ["travel_planning", "weather_forecast_check", "flight_search"]
+    expected_clarifications: ["travel_cities", "travel_dates", "budget_preference", "number_of_travelers", "flight_class_preference", "trip_duration"]
+    user_side_milestones: ["User receives flight info", "User receives weather-based suggestions","User receives travel paln"]
+    system_side_milestones: ["Called weather_forecast_check for target cities", "Called flight_search for inter-city flights", "Called travel_planning to generate itinerary"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "sequential_execution", "data_dependency"]
+    description: "Complex planning task: Design a weather- and flight-optimized multi-city trip in south China, coordinating travel, flight, and weather constraints."
+  T3_021:
+    level: "T3"
+    query: "I want to visit two cities depending on weather—plan the best order and routes."
+    expected_subagents: ["weather_forecast_check", "travel_planning", "flight_search"]
+    expected_clarifications: ["city_list", "travel_dates", "travel_duration", "budget_constraint", "preferred_transportation"]
+    user_side_milestones: ["User receives travel paln", "User reviews weather forecasts", "User receives travel routes and visit sequence"]
+    system_side_milestones: ["Called weather_forecast_check for both cities","Called travel_planning for itinerary", "Called flight_search for routes"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "multi_objective_optimization", "dependency_handling"]
+    description: "Complex travel planning based on weather for two cities, optimizing order and route."
+  T3_022:
+    level: "T3"
+    query: "I want a photography trip covering 3 cities; check weather, hotels, and routes."
+    expected_subagents: ["travel_planning", "weather_forecast_check", "hotel_accommodation_recommendation"]
+    expected_clarifications: ["city_names", "trip_dates", "photography_preferences", "budget_range", "route_preferences", "hotel_type_preferences"]
+    user_side_milestones: ["User receives itinerary covering 3 cities", "User receives weather in each city", "User receives hotel recommendations in each city", "User receives travel routes between cities"]
+    system_side_milestones: ["Called weather_forecast_check for each city", "Called hotel_accommodation_recommendation for each city", "Called travel_planning to generate routes and itinerary"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "data_dependency", "dependency_handling"]
+    description: "Complex planning task: Plan a multi-city photography trip, including weather checks, hotel recommendations, and route planning."
+  T3_023:
+    level: "T3"
+    query: "Plan a food tour: Chengdu + beijing with transport + restaurants + itinerary"
+    expected_subagents: ["travel_planning", "restaurant_recommendation", "flight_search", "hotel_accommodation_recommendation"]
+    expected_clarifications: ["travel_dates", "number_of_people", "budget_preference", "specific_cuisine_preferences", "accommodation_preference", "transport_mode_preference", "trip_duration"]
+    user_side_milestones: ["User receives itinerary", "User receives restaurant list", "User receives hotel suggestions","User receives flight to chengdu and chongqing"]
+    system_side_milestones: ["Called travel_planning for itinerary", "Called restaurant_recommendation for Chengdu", "Called restaurant_recommendation for Chongqing", "Called flight_search for flight", "Called hotel_accommodation_recommendation for stays"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "sequential_execution", "data_dependency"]
+    description: "Complex multi-city food tour planning for Chengdu and beijing, including itinerary, restaurant recommendations, transport, and accommodation with multiple constraints."
+  T3_024:
+    level: "T3"
+    query: "Plan a 5-day trip to Hangzhou: flights, hotels, restaurants, weather, routes every day."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check", "travel_planning"]
+    expected_clarifications: ["travel_date", "departure_city", "budget", "hotel_preferences", "dietary_preferences"]
+    user_side_milestones: ["User receives flight to hangzhou", "User gets hotel recommendations", "User receives daily itineraries", "User receives restaurant suggestions", "User receives weather updates"]
+    system_side_milestones: ["Called flight_search to find flights", "Called hotel_accommodation_recommendation for hotels", "Called travel_planning to generate itinerary", "Called restaurant_recommendation for restaurants", "Called weather_forecast_check for weather info"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "data_dependency", "sequential_execution", "multi_objective_optimization"]
+    description: "Complex planning task: Plan a 5-day Hangzhou trip, including flights, hotels, restaurants, daily routes, and weather checks, with multiple constraints and agent coordination."
+  T3_025:
+    level: "T3"
+    query: "Give me a 7-day plan for Shanghai including attractions by weather changes."
+    expected_subagents: ["travel_planning", "weather_forecast_check", "flight_search"]
+    expected_clarifications: ["travel_start_date", "attraction_preferences", "budget"]
+    user_side_milestones: ["User receives 7-day itinerary", "User receives weather info and attractions","User receives flight to shanghai"]
+    system_side_milestones: ["Called weather_forecast_check for Shanghai (7 days)", "Called travel_planning to generate itinerary", "Called flight_search for flights "]
+    complexity_factors: ["multi_objective_optimization", "multi_agent_coordination", "requires_clarification", "data_dependency"]
+    description: "<Complex planning task: Generate a 7-day itinerary for Shanghai, assigning attractions day-by-day according to the weather forecast.>"
+  T3_026:
+    level: "T3"
+    query: "Design a detailed 3-day itinerary for Chengdu including hourly routes if possible."
+    expected_subagents: ["travel_planning", "restaurant_recommendation", "hotel_accommodation_recommendation", "flight_search"]
+    expected_clarifications: ["travel_dates", "group_size", "budget", "special_preferences", "starting_location"]
+    user_side_milestones: ["User receives 3-day Chengdu itinerary", "User gets hourly route suggestions", "User gets restaurant recommendations", "User receives hotel options","User receives flight to chengdu"]
+    system_side_milestones: ["Called flight_search for flights ","Called travel_planning for itinerary and fetched hourly routes per day", "Called restaurant_recommendation for meal slots", "Called hotel_accommodation_recommendation for stays"]
+    complexity_factors: ["multi_objective_optimization", "multi_agent_coordination", "requires_clarification", "data_dependency", "sequential_execution"]
+    description: "Complex itinerary planning for Chengdu over 3 days with hourly routes, integrating dining and accommodation options."
+  T3_027:
+    level: "T3"
+    query: "Help me plan a long weekend including food, attractions, and route optimization."
+    expected_subagents: ["travel_planning", "restaurant_recommendation"]
+    expected_clarifications: ["destination", "travel_dates", "budget", "food_preferences", "attraction_preferences", "group_size", "transportation_mode"]
+    user_side_milestones: ["User receives itinerary", "User receives restaurant suggestions"]
+    system_side_milestones: ["Called travel_planning to optimize route and itinerary", "Called restaurant_recommendation for food options"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "sequential_execution", "dependency_handling"]
+    description: "Complex planning task: Plan a long weekend trip with optimized route, food recommendations, and attraction choices, considering user preferences and constraints."
+  T3_028:
+    level: "T3"
+    query: "Weather + flights + hotels + restaurants + route navigation + news check for Shanghai."
+    expected_subagents: ["weather_forecast_check", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning", "news_search"]
+    expected_clarifications: ["travel_dates", "departure_city", "number_of_travelers", "hotel_preferences", "restaurant_preferences", "budget_constraints", "route_navigation_mode"]
+    user_side_milestones: ["User receives Shanghai weather forecast", "User gets flight options to Shanghai", "User receives hotel recommendations in Shanghai", "User gets restaurant list in Shanghai", "User receives route navigation in Shanghai", "User gets latest Shanghai news"]
+    system_side_milestones: ["Called weather_forecast_check for Shanghai", "Called flight_search for flights to Shanghai", "Called hotel_accommodation_recommendation for Shanghai", "Called restaurant_recommendation for Shanghai", "Called travel_planning for route navigation in Shanghai", "Called news_search for Shanghai news"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "dependency_handling"]
+    description: "Complex planning task: Coordinated weather, flight, hotel, restaurant, route navigation, and news check for a Shanghai trip."
+  T3_029:
+    level: "T3"
+    query: "Plan a trip including: weather → flight → hotel → attraction → restaurant → movie."
+    expected_subagents: ["weather_forecast_check", "flight_search", "hotel_accommodation_recommendation", "travel_planning", "restaurant_recommendation", "movie_recommendation"]
+    expected_clarifications: ["travel_dates", "departure_city", "destination_city", "number_of_travelers", "budget", "attraction_preferences", "restaurant_preferences", "movie_preferences"]
+    user_side_milestones: ["User receives weather info", "User receives flight info", "User receives hotel suggestions", "User receives attraction list", "User receives restaurant list", "User receives movie recommendations"]
+    system_side_milestones: ["Called weather_forecast_check", "Queried flight_search", "Called hotel_accommodation_recommendation", "Generated attractions via travel_planning", "Called restaurant_recommendation", "Called movie_recommendation"]
+    complexity_factors: ["sequential_execution", "multi_agent_coordination", "data_dependency", "requires_clarification", "dependency_handling", "multi_objective_optimization"]
+    description: "Complex sequential trip planning with weather check, flight booking, hotel, attractions, restaurants, and movies—requires coordination across multiple agents, handling user constraints and preferences."
+  T3_030:
+    level: "T3"
+    query: "Compare 3 cities on weather, flight cost, hotel price, food options, and routes."
+    expected_subagents: ["weather_forecast_check", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["city_names", "comparison_dates", "departure_city", "budget_preferences", "food_preferences"]
+    user_side_milestones: ["User receives the weather in three cities", "User receives flight costs for 3 cities", "User gets hotel price info for 3 cities", "User receives food option details", "User receives route planning for three cities"]
+    system_side_milestones: ["Collected city_names and preferences", "Called weather_forecast_check for 3 cities", "Called flight_search for 3 cities", "Called hotel_accommodation_recommendation for 3 cities", "Called restaurant_recommendation for 3 cities", "Called travel_planning for route info", "Aggregated and compared all results"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "data_dependency", "dependency_handling"]
+    description: "Complex multi-agent comparison task: Compare three cities across weather, flights, hotels, food, and routes, requiring trade-offs, clarifications, and aggregation."
+  T3_031:
+    level: "T3"
+    query: "Help plan trip with: weather, flights, hotel, food, news, route, activities."
+    expected_subagents: ["weather_forecast_check", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "news_search", "travel_planning"]
+    expected_clarifications: ["destination", "travel_dates", "number_of_travelers", "budget", "activity_preferences", "dietary_preferences", "news_interest_topics", "hotel_preferences"]
+    user_side_milestones: ["User receives weather forecast for trip", "User receives available flights", "User receives hotel recommendations", "User receives restaurant suggestions", "User receives local news", "User receives travel route plan", "User receives activity plan"]
+    system_side_milestones: ["Called weather_forecast_check for trip dates", "Called flight_search for flight info", "Called hotel_accommodation_recommendation for stay", "Called restaurant_recommendation for food options", "Called news_search for destination activities", "Called travel_planning for itinerary"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "sequential_execution", "data_dependency"]
+    description: "Complex planning task: Coordinate weather, flight, hotel, food, news, route, and activity recommendations for a trip, requiring multiple agents, user preferences, and clarifications."
+  T3_032:
+    level: "T3"
+    query: "I want to go somewhere this weekend. Can you see if there are flights, what the weather is like, and recommend something to do at night?"
+    expected_subagents: ["flight_search", "weather_forecast_check", "travel_planning"]
+    expected_clarifications: ["departure_city", "preferred_destination", "exact_travel_dates", "budget_constraints", "activity_preferences", "number_of_travelers"]
+    user_side_milestones: ["User receives available flights", "User receives weather forecast", "User receives nighttime activity recommendations","User receives flight info"]
+    system_side_milestones: ["Called flight_search to check flights", "Called weather_forecast_check for destination weather", "Called travel_planning for nighttime activities"]
+    complexity_factors: ["requires_clarification", "multi_agent_coordination", "multi_objective_optimization", "data_dependency"]
+    description: "Complex planning task: Check flights and weather for weekend travel, recommend nighttime activities, and coordinate results with multiple constraints."
+  T3_033:
+    level: "T3"
+    query: "What’s a good city to visit next week? I care about food and the vibe. Also need help with flights and where to stay."
+    expected_subagents: ["travel_planning", "flight_search", "restaurant_recommendation", "hotel_accommodation_recommendation","weather_forecast_check"]
+    expected_clarifications: ["travel_date", "departure_city", "budget_preference", "food_preferences", "vibe_preference"]
+    user_side_milestones: ["User receives recommended cities itinerary","User receives flight info", "User receives weather forecast", "User receives restaurant recommendations","User receives hotel"]
+    system_side_milestones: ["Called travel_planning for city recommendations","Called restaurant_recommendation for best local food spots", "Called flight_search for flight options", "Called hotel_accommodation_recommendation for places to stay","Called weather_forecast_check for recommendation city"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "multi_objective_optimization", "sequential_execution", "data_dependency"]
+    description: "Complex travel planning task: Recommend city based on food and vibe, then assist with restaurant choices, flight search, and accommodation booking for next week."
+  T3_034:
+    level: "T3"
+    query: "I want to go to Guangzhou but I don’t know where to stay or what to do. Also need info on flights and weather."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "travel_planning", "weather_forecast_check","news_search","restaurant_recommendation"]
+    expected_clarifications: ["departure_city", "travel_date_range", "budget_preference", "accommodation_type_preference", "activity_preference"]
+    user_side_milestones: ["User receives flight options to Guangzhou", "User receives accommodation recommendations", "User receives activity/itinerary suggestions", "User receives Guangzhou weather info","User receives restaurant suggestions"]
+    system_side_milestones: ["Called flight_search to query flights to Guangzhou", "Called hotel_accommodation_recommendation for Guangzhou stays", "Called travel_planning for Guangzhou activities", "Called weather_forecast_check for Guangzhou", "Called news_search for activities","Called restaurant_recommendation for restaurant"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "data_dependency"]
+    description: "Complex planning task: User requests flight, accommodation, activities, and weather details for a trip to Guangzhou but provides minimal initial information. Requires multi-agent coordination and clarification."
+  T3_035:
+    level: "T3"
+    query: "I’m landing in Shanghai for work but thinking to stay two extra days. Help me check what to do depending on the weather, restaurants, and maybe navigate between places."
+    expected_subagents: ["weather_forecast_check", "restaurant_recommendation", "travel_planning","flight_search", "hotel_accommodation_recommendation", "news_search"]
+    expected_clarifications: ["exact_dates_of_stay", "preferred_cuisines", "transportation_preferences", "budget_constraints", "attraction_interests", "work_location"]
+    user_side_milestones: ["User receives weather forecast", "User receives restaurant recommendations", "User receives 2-day itinerary", "User gets activities","User receives flight to shanghai"]
+    system_side_milestones: ["Called weather_forecast_check for Shanghai", "Called restaurant_recommendation for Shanghai", "Called travel_planning to generate itinerary", "Called hotel_accommodation_recommendation for hotels","Called news_search for fun activities","Called flight_search for flight options"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "dependency_handling"]
+    description: "Complex planning task: Coordinate weather, restaurant, and itinerary recommendations for a 2-day extended stay in Shanghai with navigation guidance."
+  T3_036:
+    level: "T3"
+    query: "I want to go somewhere chill for photography. Need weather checks, places to shoot, flight options, hotels with views, and food nearby."
+    expected_subagents: ["weather_forecast_check", "travel_planning", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation"]
+    expected_clarifications: ["destination_preference", "travel_dates", "budget_range", "photography_preferences", "number_of_travelers", "hotel_view_preference"]
+    user_side_milestones: ["User receives weather info", "User gets shooting locations", "User receives Flight info", "User receives hotel options with views shown", "User receives nearby food recommendations","User receives restaurant suggestions"]
+    system_side_milestones: ["Called flight_search for flight options", "Called hotel_accommodation_recommendation for hotels", "Called restaurant_recommendation for meals","Called travel_planning for itinerary","Called weather_forecast_check for destination weather"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "data_dependency", "sequential_execution"]
+    description: "Complex trip planning for a photography-focused getaway: determine suitable destinations with good weather, recommend photography locations, find flights and hotels (with views), and suggest nearby food."
+  T3_037:
+    level: "T3"
+    query: "Give me two itinerary choices and after I pick one, plan the routes."
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation"]
+    expected_clarifications: ["destination", "travel_dates", "preferences", "starting_location", "number_of_travelers"]
+    user_side_milestones: ["User receives itinerary options", "User receives flight info", "User receives hotel recommendations", "User receives daily activity plans", "User receives restaurant suggestions"]
+    system_side_milestones: ["Called flight_search for flight options", "Called hotel_accommodation_recommendation for hotels", "Called restaurant_recommendation for meals","Called travel_planning for itinerary","Called weather_forecast_check for destination weather"]
+    complexity_factors: ["multi_agent_coordination", "requires_clarification", "sequential_execution", "dependency_handling", "multi_objective_optimization"]
+    description: "Complex planning task: Generate two itinerary options, collect user choice, then plan routes for the selected itinerary."
+  T3_038:
+    level: "T3"
+    query: "I want a 3-day relaxing trip to Hangzhou. Help me plan the itinerary, including flights, hotel options near West Lake, weather forecast, recommended restaurants, and the best walking routes between attractions."
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation"]
+    expected_clarifications: ["departure_city", "travel_dates", "train_or_flight_preference", "budget", "number_of_travelers", "dietary_preferences", "walking_distance_preference"]
+    user_side_milestones: ["User receives itinerary plan", "User receives flight/train options", "User receives hotel recommendations near West Lake", "User informed of Hangzhou weather forecast", "User receives recommended restaurants", "User receives best walking routes between attractions"]
+    system_side_milestones: ["Called travel_planning to generate itinerary", "Called flight_search for Hangzhou transport options", "Called hotel_accommodation_recommendation for West Lake hotels", "Called weather_forecast_check for Hangzhou", "Called restaurant_recommendation for Hangzhou restaurants", "Called travel_planning generated routes"]
+    complexity_factors: ["multi_agent_coordination", "multi_objective_optimization", "requires_clarification", "dependency_handling", "sequential_execution"]
+    description: "Complex trip planning for a 3-day relaxing Hangzhou itinerary, coordinating transport, hotels near West Lake, weather, restaurants, and walking routes."
+  T4_001:
+    level: "T4"
+    query: "Plan a 4-day warm-weather trip anywhere with full daily plans."
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation"]
+    expected_clarifications: ["desired_travel_dates", "budget", "preferred_warm_weather_temperature", "departure_location", "activity_preferences", "travel_companions", "dietary_restrictions", "hotel_preference", "flight_class_preference"]
+    user_side_milestones: ["User receives itinerary options", "User receives flight info", "User receives hotel recommendations", "User receives daily activity plans", "User receives restaurant suggestions"]
+    system_side_milestones: ["Called flight_search for flight options", "Called hotel_accommodation_recommendation for hotels", "Called restaurant_recommendation for meals","Called travel_planning for itinerary","Called weather_forecast_check for destination weather"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "multi_objective_optimization", "hierarchical_execution", "dependency_handling"]
+    description: "Open-ended trip planning task for a 4-day warm-weather vacation with complete daily plans, requiring elicitation of preferences, constraints, and coordination across travel, accommodation, activity, and meal agents."
+  T4_002:
+    level: "T4"
+    query: "I want to go somewhere nice for a trip soon."
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation"]
+    expected_clarifications: ["destination_preference", "travel_dates", "budget", "number_of_travelers", "trip_duration", "activity_preferences", "departure_city"]
+    user_side_milestones: ["User receives trip plan suggestions", "User receives hotel options","User receives restaurant recommendations", "User receives weather info","User receives flight options"]
+    system_side_milestones: ["Called travel_planning for itinerary", "Called flight_search for flights", "Called hotel_accommodation_recommendation for lodging", "Called weather_forecast_check for destination weather", "Called restaurant_recommendation for dining options"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification"]
+    description: "Open-ended travel planning task requiring clarification of preferences, destination, dates, and coordination of multiple agents for a personalized trip plan."
+  T4_003:
+    level: "T4"
+    query: "I'm thinking about taking a trip soon. Can you help me with everything I might need?"
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "travel_planning", "weather_forecast_check"]
+    expected_clarifications: ["destination", "travel_dates", "number_of_travelers", "budget", "travel_preferences", "accommodation_preferences", "dietary_restrictions", "activities_of_interest", "departure_location"]
+    user_side_milestones: ["User receives itinerary plan", "User receives flight options", "User receives hotel suggestions", "User receives restaurant recommendations", "User receives weather info"]
+    system_side_milestones: ["Called travel_planning for itinerary", "Called flight_search for flights", "Called hotel_accommodation_recommendation for hotels", "Called restaurant_recommendation for restaurants", "Called weather_forecast_check for weather"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "hierarchical_execution", "dependency_handling"]
+    description: "Open-ended travel planning task requiring proactive requirement elicitation, multiple clarifications, and coordination across several agents to address all aspects of a potential trip."
+  T4_004:
+    level: "T4"
+    query: "I want to go somewhere interesting for a few days. Can you help me plan my trip?"
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check","news_search"]
+    expected_clarifications: ["destination_preference", "travel_dates", "number_of_travelers", "budget", "activity_preferences", "departure_location", "accommodation_type", "dietary_preferences"]
+    user_side_milestones: ["User receives itinerary", "User receives flight options", "User receives hotel options", "User receives restaurant options","User receives weather info","Users receive fun activities"]
+    system_side_milestones: ["Called travel_planning for itinerary", "Called flight_search for flights", "Called hotel_accommodation_recommendation for hotels", "Called restaurant_recommendation for restaurants", "Checked weather via weather_forecast_check","Called news_search for fun activaties"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "hierarchical_execution", "requires_clarification"]
+    description: "<Open-Ended Trip Planning: Elicit requirements, clarify user preferences, and coordinate travel planning, flight, hotel, and restaurant suggestions.>"
+  T4_005:
+    level: "T4"
+    query: "I'm thinking about taking a trip somewhere soon, but I'm not sure where to go, what to do, or where to stay. Can you help me figure it out?"
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check"]
+    expected_clarifications: ["travel_dates", "departure_location", "budget", "travel_preferences", "number_of_travelers", "preferred_activities", "accommodation_type", "dietary_preferences"]
+    user_side_milestones: ["User reviews itinerary options", "User receives activity and restaurant ideas","User receives flight options", "User receives hotel recommendations","User receives weather info"]
+    system_side_milestones: ["Called travel_planning for destination ideas", "Called flight_search for flight options", "Called hotel_accommodation_recommendation for stays", "Called restaurant_recommendation for dining", "Called weather_forecast_check for climate info"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "hierarchical_execution"]
+    description: "<Open-ended Task: Comprehensive travel planning with severely missing information, requires proactive requirement elicitation and multi-agent orchestration>"
+  T4_006:
+    level: "T4"
+    query: "I’m thinking of going somewhere in the south next month… maybe Shanghai? Not sure. Can you help check what I should prepare and maybe where to stay and eat?"
+    expected_subagents: ["travel_planning", "hotel_accommodation_recommendation", "restaurant_recommendation","travel_planning","flight_search"]
+    expected_clarifications: ["destination_city", "travel_dates", "number_of_travelers", "travel_budget", "accommodation_preferences", "cuisine_preferences", "trip_duration", "specific_needs_or_constraints"]
+    user_side_milestones: ["User receives travel plans for Shanghai or some southern location.", "User receives flight options", "User receives hotel recommendations","User receives restaurant suggestions","Called flight_search for flight options"]
+    system_side_milestones: ["Called flight_search for flight options","Called travel_planning for preparation advice", "Called hotel_accommodation_recommendation for lodging", "Called restaurant_recommendation for dining options"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification"]
+    description: "Open-ended travel query requiring clarification of destination and preferences; involves itinerary, accommodation, and dining suggestions."
+  T4_007:
+    level: "T4"
+    query: "Can you help me plan a trip to Shanghai… or Hangzhou? Not sure which is better. Need flight stuff, hotel, weather, and maybe what to do there."
+    expected_subagents: ["flight_search", "hotel_accommodation_recommendation", "weather_forecast_check", "travel_planning"]
+    expected_clarifications: ["destination_preference", "departure_city", "travel_dates", "budget", "number_of_travelers", "travel_duration", "activity_preferences"]
+    user_side_milestones: ["User receives travel plans for Shanghai and Hangzhou.", "User receives flight options", "User receives hotel recommendations", "User receives weather forecast", "User receives activity suggestions"]
+    system_side_milestones: ["Called flight_search for flight options", "Called hotel_accommodation_recommendation for hotels", "Called weather_forecast_check for weather info", "Called travel_planning for activity suggestions"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "dependency_handling", "hierarchical_execution"]
+    description: "Open-ended travel planning task requiring clarification of destination, dates, preferences, and coordination of flights, hotels, weather, and activities for Shanghai or Hangzhou."
+  T4_008:
+    level: "T4"
+    query: "Can you help me plan a multi-stop trip? I don’t know the order yet… maybe Shanghai, Suzhou, Hangzhou? Need routes, hotels, weather, food."
+    expected_subagents: ["travel_planning", "hotel_accommodation_recommendation", "weather_forecast_check", "restaurant_recommendation", "flight_search"]
+    expected_clarifications: ["travel_dates", "trip_duration", "stop_order", "budget_constraints", "specific_preferences", "number_of_travelers", "hotel_preferences", "dietary_preferences"]
+    user_side_milestones: ["User receives multi-stop trip", "User receives hotel options", "User receives weather updates", "User receives restaurant suggestions", "User receives flight options"]
+    system_side_milestones: ["Called travel_planning to generate itinerary", "Called hotel_accommodation_recommendation for each city", "Called weather_forecast_check for each city", "Called restaurant_recommendation for each city", "Called flight_search to find flights"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "dependency_handling", "requires_clarification", "hierarchical_execution"]
+    description: "Open-ended multi-stop trip planning with ambiguous order and missing key details, requiring routes, hotels, weather, and food recommendations for Shanghai, Suzhou, and Hangzhou."
+  T4_009:
+    level: "T4"
+    query: "Actually I need a 3-day plan with weather + hotel + transport + food, but the place I haven’t decided."
+    expected_subagents: ["travel_planning", "weather_forecast_check", "hotel_accommodation_recommendation", "restaurant_recommendation", "flight_search"]
+    expected_clarifications: ["destination_location", "travel_dates", "number_of_travelers", "budget_preferences", "food_preferences", "transport_preferences"]
+    user_side_milestones: ["User receiving 3-Day travel plan", "User receives flight options", "User receives hotel suggestions", "User receives restaurant recommendations", "User receives weather info"]
+    system_side_milestones: ["Called weather_forecast_check for target dates and location", "Called travel_planning for draft itinerary", "Called hotel_accommodation_recommendation for options", "Called restaurant_recommendation for food suggestions", "Called flight_search for transport options"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "dependency_handling", "hierarchical_execution"]
+    description: "Open-ended 3-day travel plan requiring destination, weather, hotel, transport, and food arrangement; proactive clarification and multi-agent coordination needed."
+  T4_010:
+    level: "T4"
+    query: "I want to go to Shanghai. Help me plan everything."
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check"]
+    expected_clarifications: ["departure_city", "travel_dates", "number_of_travelers", "budget_range", "accommodation_preferences", "attraction_preferences", "dietary_preferences", "trip_duration", "family_member_constraints", "transportation_preferences", "activity_level"]
+    user_side_milestones: ["User receives complete Shanghai itinerary", "User receives flight options", "User receives hotel suggestions", "User receives restaurant recommendations", "User receives weather info"]
+    system_side_milestones: ["Called travel_planning to generate itinerary", "Called flight_search to find flights", "Called hotel_accommodation_recommendation for hotels", "Called restaurant_recommendation for dining", "Called weather_forecast_check for Shanghai"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "hierarchical_execution", "dependency_handling"]
+    description: "Open-ended travel planning task: Elicit requirements and plan all aspects of a trip to Shanghai, including flights, accommodation, dining, and itinerary."
+  T4_011:
+    level: "T4"
+    query: "Want a weekend trip."
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check"]
+    expected_clarifications: ["destination_preference", "travel_dates", "departure_location", "budget", "number_of_travelers", "activity_preferences", "accommodation_type", "dietary_restrictions"]
+    user_side_milestones: ["User receives flight options","User receives weekend travel plan","User receives recommended places","User receives recommended restaurant","User receives recommended hotel","User receives recommended good weather"]
+    system_side_milestones: ["Called travel_planning for itinerary", "Called flight_search for flights", "Called hotel_accommodation_recommendation for lodging", "Called restaurant_recommendation for dining", "Called weather_forecast_check for target dates and location"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "dependency_handling"]
+    description: "Open-ended weekend trip planning request requiring proactive clarification of destination, dates, preferences, and coordination across multiple agents for itinerary, transport, accommodation, and dining."
+  T4_012:
+    level: "T4"
+    query: "I need a travel plan for somewhere warm."
+    expected_subagents: ["travel_planning","flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check"]
+    expected_clarifications: ["destination_preference", "travel_dates", "budget", "number_of_travelers", "trip_duration", "activity_preferences", "departure_location"]
+    user_side_milestones: ["User receives flight options","User receives tailored travel plan","User receives recommended places","User receives recommended restaurant","User receives recommended hotel","User receives recommended good weather"]
+    system_side_milestones: ["Called travel_planning for itinerary", "Called flight_search for flights", "Called hotel_accommodation_recommendation for lodging", "Called restaurant_recommendation find restaurant", "Called weather_forecast_check for weather info"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "requires_clarification"]
+    description: "Open-ended travel planning request for a warm destination; requires proactive clarification and detailed requirement elicitation before generating a plan."
+  T4_013:
+    level: "T4"
+    query: "I need you help me make a travel plan"
+    expected_subagents: ["travel_planning", "flight_search", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check"]
+    expected_clarifications: ["travel_destination", "travel_dates", "number_of_travelers", "budget_constraints", "travel_preferences", "transportation_preferences", "accommodation_preferences"]
+    user_side_milestones: ["User receives flight options","User receives travel plan","User receives recommended places","User receives recommended restaurant","User receives recommended hotel","User receives recommended good weather"]
+    system_side_milestones: ["Called travel_planning for itinerary", "Called flight_search for flights", "Called hotel_accommodation_recommendation for lodging", "Called restaurant_recommendation find restaurant", "Called weather_forecast_check for weather info"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "dependency_handling", "hierarchical_execution"]
+    description: "Open-ended travel planning task requiring proactive requirement elicitation, multi-agent coordination, and comprehensive clarification before execution."
+  T4_014:
+    level: "T4"
+    query: "I want to go somewhere interesting soon, maybe relax or try something new. What do you suggest?"
+    expected_subagents: ["travel_planning", "hotel_accommodation_recommendation", "restaurant_recommendation", "weather_forecast_check"]
+    expected_clarifications: ["preferred_travel_date", "budget_range", "preferred_location", "relaxation_vs_new_experience", "travel_companions", "duration_of_trip", "activity_preferences"]
+    user_side_milestones: ["User receives suggested destinations", "User gets activity recommendations", "User sees accommodation options", "User receives weather info", "User receives food recommendation"]
+    system_side_milestones: ["Called travel_planning for destination ideas", "Called hotel_accommodation_recommendation for lodging", "Called restaurant_recommendation for dining options", "Called weather_forecast_check for destination climate"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "dependency_handling"]
+    description: "Open-ended travel and activity suggestion task with ambiguous user intent, requiring proactive multi-turn clarification and coordination of multiple agents."
+  T4_015:
+    level: "T4"
+    query: "I want to go on a short trip but I only know I want good food and not too hot weather. Maybe also help see how to get there?"
+    expected_subagents: ["travel_planning", "restaurant_recommendation", "weather_forecast_check", "flight_search"]
+    expected_clarifications: ["departure_location", "travel_date_or_range", "preferred_cuisines", "budget", "trip_duration", "travel_companions", "preferred_transport_mode"]
+    user_side_milestones: ["User receives city recommendations with good weather", "User receives trip plan", "User receives food recommendation", "User receives flight recommendation"]
+    system_side_milestones: ["Called travel_planning to suggest destinations", "Called weather_forecast_check for destinations", "Called restaurant_recommendation for local food", "Called flight_search for transport options"]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification", "dependency_handling", "hierarchical_execution"]
+    description: "Open-ended trip planning task requiring elicitation of user preferences and constraints regarding food, weather, and transportation, then coordinating multiple agents to generate a suitable trip plan."
+  T4_016:
+    level: "T4"
+    query: "I want to visit a city with good food."
+    expected_subagents: ["restaurant_recommendation", "travel_planning"]
+    expected_clarifications: ["preferred_cuisine", "travel_date", "budget", "possible_cities", "travel_duration", "number_of_travelers", "departure_city", "accommodation_type", "food_preferences"]
+    user_side_milestones: ["User receives city recommendations", "User receives food/restaurant options", "User receives itinerary suggestions"]
+    system_side_milestones: ["Called travel_planning to suggest cities", "Called restaurant_recommendation find "]
+    complexity_factors: ["open_ended", "requires_many_clarifications", "multi_agent_coordination", "requires_clarification"]
+    description: "Open-ended travel planning task requiring clarification and recommendation of cities with good food."

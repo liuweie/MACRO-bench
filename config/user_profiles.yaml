@@ -1,0 +1,181 @@
+user_profiles:
+  profile_001:
+    name:
+      zh: "商务旅行者"
+      en: "Business Traveler"
+    characteristics:
+      - "注重效率"
+      - "预算中等"
+      - "喜欢便捷交通"
+      - "需要商务设施"
+    response_patterns:
+      budget:
+        zh: "预算5000左右"
+        en: "About 5000 CNY budget"
+      dates:
+        zh: "下周三到周五"
+        en: "Next Wed to Fri"
+      preferences:
+        zh: "需要离会议中心近的酒店"
+        en: "Prefer hotels near the conference center"
+      
+  profile_002:
+    name:
+      zh: "家庭游客"
+      en: "Family Traveler"
+    characteristics:
+      - "注重亲子设施"
+      - "预算有限"
+      - "喜欢景点游玩"
+      - "需要家庭房"
+    response_patterns:
+      budget:
+        zh: "全家预算8000以内"
+        en: "Family budget within 8000 CNY"
+      dates:
+        zh: "暑假期间，7月10号到15号"
+        en: "During summer break, Jul 10 to Jul 15"
+      preferences:
+        zh: "要有儿童游乐设施，景点要适合小孩"
+        en: "Needs child-friendly facilities and attractions suitable for kids"
+      
+  profile_003:
+    name:
+      zh: "背包客"
+      en: "Backpacker"
+    characteristics:
+      - "预算紧张"
+      - "喜欢自由行"
+      - "注重体验"
+      - "不需要豪华住宿"
+    response_patterns:
+      budget:
+        zh: "尽量便宜，总花费3000以下"
+        en: "Keep costs low, total under 3000 CNY"
+      dates:
+        zh: "时间灵活，大概5天左右"
+        en: "Flexible timing, around 5 days"
+      preferences:
+        zh: "想体验当地文化，住宿要经济型"
+        en: "Interested in local culture, prefer budget stays"
+  profile_004:
+    name:
+      zh: "奢华旅客"
+      en: "Luxury Traveler"
+    characteristics:
+      - "追求高端体验"
+      - "预算充足"
+      - "偏好五星级及以上酒店"
+      - "注重私密与定制化服务"
+    response_patterns:
+      budget:
+        zh: "预算充足，按体验选择"
+        en: "Flexible budget, choose by experience"
+      dates:
+        zh: "时间灵活，优先热门时段"
+        en: "Flexible timing, prefer peak periods"
+      preferences:
+        zh: "需安排高端餐厅与专属导游"
+        en: "Arrange fine dining and private guides"
+
+  profile_005:
+    name:
+      zh: "独行者/单人旅客"
+      en: "Solo Traveler"
+    characteristics:
+      - "喜欢独自探索"
+      - "偏好灵活行程"
+      - "注重安全与社交机会"
+      - "可接受中高档住宿"
+    response_patterns:
+      budget:
+        zh: "希望经济且舒适，预算看活动"
+        en: "Prefer economical yet comfortable, budget depends on activities"
+      dates:
+        zh: "短期出行，3-7天"
+        en: "Short trips, 3-7 days"
+      preferences:
+        zh: "希望有社交活动或小团体体验"
+        en: "Prefer social activities or small group experiences"
+
+  profile_006:
+    name:
+      zh: "资深/老年旅客"
+      en: "Senior Traveler"
+    characteristics:
+      - "偏好舒适与安全"
+      - "需要无障碍/低强度行程"
+      - "注重医疗与保险信息"
+      - "喜欢文化深度游"
+    response_patterns:
+      budget:
+        zh: "预算中等，注重舒适"
+        en: "Moderate budget, prefer comfort"
+      dates:
+        zh: "避开高强度季节， prefer weekdays"
+        en: "Avoid peak seasons, prefer weekdays"
+      preferences:
+        zh: "需要更多休息时间和医疗保障信息"
+        en: "Need more rest time and medical/insurance info"
+
+  profile_007:
+    name:
+      zh: "数字游牧者"
+      en: "Digital Nomad"
+    characteristics:
+      - "远程工作者，长期停留"
+      - "关注网络与工作环境"
+      - "偏好长期住宿折扣"
+      - "喜欢本地化生活体验"
+    response_patterns:
+      budget:
+        zh: "倾向长期性价比高的住宿"
+        en: "Prefer long-term cost-effective stays"
+      dates:
+        zh: "长期灵活，通常按月安排"
+        en: "Flexible long-term stays, usually monthly"
+      preferences:
+        zh: "需要稳定的网络和工作空间"
+        en: "Need stable internet and workspace"
+
+
+clarification_responses:
+  travel_dates:
+    - zh: "我想下个月15号出发，20号回来"
+    - en: "I want to depart on the 15th of next month and return on the 20th"
+    - zh: "计划国庆期间去，大概7天"
+    - en: "Plan to travel during National Day, about 7 days"
+    - zh: "时间还没定，先看看有什么选择"
+    - en: "Dates are not decided yet; show me options first"
+    
+  budget_range:
+    - zh: "总预算5000元左右"
+    - en: "Total budget around 5000 CNY"
+    - zh: "不要太贵，经济实惠就行"
+    - en: "Not too expensive, economical is fine"
+    - zh: "预算比较宽松，主要看体验"
+    - en: "Budget is flexible; experience matters most"
+    
+  destination:
+    - zh: "想去云南大理和丽江"
+    - en: "I'd like to go to Dali and Lijiang, Yunnan"
+    - zh: "主要在北京玩"
+    - en: "Mainly staying in Beijing"
+    - zh: "西安的历史景点"
+    - en: "Historical sites in Xi'an"
+    
+  interests:
+    - zh: "喜欢自然风光和拍照"
+    - en: "Enjoy nature scenery and photography"
+    - zh: "对历史文化和美食感兴趣"
+    - en: "Interested in history, culture and food"
+    - zh: "主要是休闲度假，不要太累"
+    - en: "Mainly leisure vacation, not too tiring"
+    
+  accommodation:
+    - zh: "需要星级酒店，四星以上"
+    - en: "Prefer star-rated hotels, 4-star+"
+    - zh: "民宿或者经济型酒店就可以"
+    - en: "Hostels or budget hotels are fine"
+    - zh: "希望住在景点附近"
+    - en: "Prefer accommodation near attractions"
