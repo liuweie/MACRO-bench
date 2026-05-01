@@ -1,13 +1,13 @@
-# 插件配置
+# Plugin configuration
 enabled: true
 
-# 插件搜索路径
+# Plugin search paths
 plugin_dirs:
   - "plugins/"
   - "custom_plugins/"
   - "${HOME}/.cogbenchmark/plugins/"
 
-# 要加载的插件模块
+# Plugin modules to load
 plugin_modules:
   - plugins.travel_domain_plugin
   - plugins.travel_evaluator_plugin
@@ -16,7 +16,7 @@ plugin_modules:
   - plugins.json_reporter_plugin
   - plugins.otel_evaluator_plugin
 
-# 插件加载顺序（数字越小越先加载）
+# Plugin load priority (smaller number loads earlier)
 plugin_priority:
   # module-level priorities (fallback if class-level name not matched)
   latc_orchestrator_plugin: 5
@@ -34,7 +34,7 @@ plugin_priority:
   JsonReporterPlugin: 30
   OtelEvaluatorPlugin: 15
 
-# 插件配置
+# Plugin configuration
 plugins:
   travel_domain_plugin:
     enabled: true
@@ -85,25 +85,25 @@ hook_chains:
 # domain specific mappings for future multi-domain support
 domains:
   travel:
-    orchestrator_type: LATC
+    orchestrator_type: ORCHESTRATOR
     orchestrator_chain: [latc_orchestrator_plugin]
     evaluator_chain: [otel_evaluator_plugin, travel_evaluator_plugin]
     reporter_chain: [html_reporter_plugin, json_reporter_plugin]
     user_simulator_plugin: travel_domain_plugin
   default:
-    orchestrator_type: LATC
+    orchestrator_type: ORCHESTRATOR
     orchestrator_chain: [latc_orchestrator_plugin]
     evaluator_chain: [otel_evaluator_plugin]
     reporter_chain: [html_reporter_plugin]
 
 
-# 自动发现设置
+# Auto discovery settings
 auto_discovery:
   enabled: true
-  scan_interval: 300  # 5分钟
+  scan_interval: 300  # 5 minutes
   hot_reload: false
 
-# 插件依赖管理
+# Plugin dependency management
 dependencies:
   required_plugins:
     - travel_domain_plugin
@@ -115,13 +115,13 @@ dependencies:
     - otel_evaluator_plugin
     
 
-# 控制台输出选项
+# Console output options
 logging:
   show_plugin_summary: true
   show_plugin_pipeline: true
   show_full_conversation: true
 
-# 插件验证
+# Plugin validation
 validation:
   enabled: true
   check_hook_implementations: true

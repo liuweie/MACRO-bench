@@ -1,6 +1,6 @@
-# Benchmark 配置主文件
+# Benchmark main configuration file
 
-# 全局默认配置
+# Global default settings
 defaults:
   orchestrator_url: "http://localhost:8000"
   simulator_priority: "llm-first"
@@ -12,7 +12,7 @@ defaults:
   success_threshold: 0.5
   scoring_mode: "full"
 
-# LLM 配置
+# LLM settings
 llm_config:
   openai:
     api_key: "${OPENAI_API_KEY}"
@@ -24,7 +24,7 @@ llm_config:
     model: "claude-3-sonnet"
     max_tokens: 1000
 
-# 领域特定配置
+# Domain-specific settings
 domains:
   travel:
     name: "Travel domain"
@@ -41,7 +41,7 @@ domains:
       - budget_analysis
     
 
-# 报告配置
+# Reporting settings
 reporting:
   default_output_dir: "output"
   formats:

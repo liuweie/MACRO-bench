@@ -1,0 +1,327 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "arrayShape": "cr:arrayShape",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "containedIn": "cr:containedIn",
+    "cr": "http://mlcommons.org/croissant/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataBiases": "cr:dataBiases",
+    "dataCollection": "cr:dataCollection",
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isArray": "cr:isArray",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "personalSensitiveInformation": "cr:personalSensitiveInformation",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "prov": "http://www.w3.org/ns/prov#"
+  },
+  "@type": "sc:Dataset",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "repo",
+      "name": "repo",
+      "description": "The Hugging Face git repository.",
+      "contentUrl": "https://huggingface.co/datasets/anonymousnamefornips/MACRO-bench/tree/refs%2Fconvert%2Fparquet",
+      "encodingFormat": "git+https",
+      "sha256": "https://github.com/mlcommons/croissant/issues/80"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "parquet-files-for-config-default",
+      "containedIn": {
+        "@id": "repo"
+      },
+      "encodingFormat": "application/x-parquet",
+      "includes": "default/*/*.parquet"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "dataType": "cr:Split",
+      "key": {
+        "@id": "default_splits/split_name"
+      },
+      "@id": "default_splits",
+      "name": "default_splits",
+      "description": "Splits for the default config.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "default_splits/split_name",
+          "dataType": "sc:Text"
+        }
+      ],
+      "data": [
+        {
+          "default_splits/split_name": "train"
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "default",
+      "description": "anonymousnamefornips/MACRO-bench - 'default' subset",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "default/split",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "fileProperty": "fullpath"
+            },
+            "transform": {
+              "regex": "default/(?:partial-)?(train)/.+parquet$"
+            }
+          },
+          "references": {
+            "field": {
+              "@id": "default_splits/split_name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/task_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "task_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/version",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "version"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/level",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "level"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/expected_subagents",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "expected_subagents"
+            }
+          },
+          "isArray": true,
+          "arrayShape": "-1"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/expected_clarifications",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "expected_clarifications"
+            }
+          },
+          "isArray": true,
+          "arrayShape": "-1"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/user_side_milestones",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "user_side_milestones"
+            }
+          },
+          "isArray": true,
+          "arrayShape": "-1"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/system_side_milestones",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "system_side_milestones"
+            }
+          },
+          "isArray": true,
+          "arrayShape": "-1"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/complexity_factors",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "complexity_factors"
+            }
+          },
+          "isArray": true,
+          "arrayShape": "-1"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "default/description",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": {
+              "@id": "parquet-files-for-config-default"
+            },
+            "extract": {
+              "column": "description"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "conformsTo": "http://mlcommons.org/croissant/1.1",
+  "name": "MACRO-bench",
+  "description": "anonymousnamefornips/MACRO-bench dataset hosted on Hugging Face and contributed by the HF Datasets community",
+  "alternateName": [
+    "anonymousnamefornips/MACRO-bench",
+    "MACRO-bench"
+  ],
+  "creator": {
+    "@type": "Person",
+    "name": "anonymous_nips_submission",
+    "url": "https://huggingface.co/anonymousnamefornips"
+  },
+  "keywords": [
+    "text-generation",
+    "English",
+    "mit",
+    "n<1K",
+    "🇺🇸 Region: US",
+    "multi-agent",
+    "agent-orchestration",
+    "benchmarking",
+    "HITL",
+    "Clarification-Aware"
+  ],
+  "license": "https://choosealicense.com/licenses/mit/",
+  "url": "https://huggingface.co/datasets/anonymousnamefornips/MACRO-bench",
+  "rai:dataLimitations": "This dataset has several known limitations:\n\n1. Milestone labels are benchmark-oriented rather than gold-standard annotations.\nBecause travel tasks are open-ended and multi-agent interactions can be valid in multiple ways, milestone definitions are operational and evaluative, not strict ground-truth labels.\n\n2. Dataset size is still limited.\nThe current release contains a dense subset of 30 tasks and a fuller subset of 107 tasks. This may not cover the full diversity of real-world user intents, constraints, and interaction trajectories.\n\n3. Focus is on inter-agent orchestration only.\nThe dataset evaluates coordination across multiple agents, but does not model or evaluate internal orchestration within a single agent (e.g., tool routing/tool-calling chains, planner-executor internals).",
+  "rai:dataBiases": "This dataset has a known regional bias.\nBecause the benchmark uses real agents and tools on the COZE platform, tool availability is stronger for Mainland China scenarios than for many rest-of-world scenarios.\n\nAs a result:\n\nTask queries are more China-centric.\nUser simulator profiles are also region-constrained.\nPerformance may look better on China-focused tasks and weaker on out-of-region tasks, partly due to tool coverage differences rather than orchestration quality alone.",
+  "rai:personalSensitiveInformation": "This dataset does not contain real personal or sensitive information.\nNo personally identifiable and Sensitive infomation is included.",
+  "rai:dataUseCases": "This dataset is designed to measure multi-agent orchestration capability in open-ended travel planning, especially:\n\ntask decomposition and sub-agent routing,\nclarification behavior under missing constraints,\nmilestone-level completion from user-side and system-side views.\nValidated use cases\n\nOffline benchmarking of multi-agent travel assistants in our benchmark pipeline (task-level and milestone-level evaluation).\nComparative evaluation across task complexity levels (T1-T4).\nNot validated / may not hold\n\nGeneral-domain assistant evaluation outside travel.\nSingle-agent internal tool orchestration evaluation.",
+  "rai:dataSocialImpact": "Potential positive impact:\nThis dataset can help improve evaluation quality for multi-agent orchestartion assistants, especially in clarification, planning consistency, and orchestration reliability\n\nPotential negative impact / misuse risks:\nIf a user's sub-agent pool has materially different capabilities from the agent setup used in our benchmark construction, the dataset labels may become less faithful for measuring real system performance. In such cases, direct reuse of the dataset alone can lead to misleading conclusions. We therefore recommend following the full dataset-construction protocol and toolchain described in our paper, rather than using only the released dataset in isolation.",
+  "rai:hasSyntheticData": true,
+  "prov:wasDerivedFrom": [
+    {
+      "@id": "https://huggingface.co/datasets/anonymousnamefornips/MACRO-bench/blob/main/SOURCE_DATA.md",
+      "prov:label": "MACRO-seed"
+    }
+  ],
+  "prov:wasGeneratedBy": [
+    {
+      "@type": "prov:Activity",
+      "prov:type": "Data Collection",
+      "prov:label": "Query & Expected Sub-agent Collection and Expansion",
+      "prov:description": "Seed tasks were collected from real internal usage scenarios. We applied quality filtering to remove noisy, overly specific, or non-reusable instances, keeping only tasks that can be abstracted into reusable high-level categories. Based on a predefined data maturity model (with explicit dimensions and corresponding schema fields), we expanded task diversity through controlled generation and schema-constrained normalization. This stage produced the unlabeled tasks_full set."
+    },
+    {
+      "@type": "prov:Activity",
+      "prov:type": "Filtering",
+      "prov:label": "Matrix-based Data Filtering",
+      "prov:description": "We performed dataset slimming and filtering using a predefined 3×3×3 coverage matrix to balance complexity, capability, and scenario diversity. Redundant, low-information, and distribution-skewed samples were removed to improve representativeness and evaluation efficiency."
+    },
+    {
+      "@type": "prov:Activity",
+      "prov:type": "Annotation",
+      "prov:label": "Hybrid LLM + Expert Gold Annotation",
+      "prov:description": "We used a two-stage annotation pipeline: (1) LLM pre-annotation to generate initial labels across evaluation dimensions, followed by (2) expert alignment by five human annotators to correct and finalize gold labels. Final annotations were produced after expert reconciliation to ensure consistency and quality."
+    },
+    {
+      "@type": "prov:Activity",
+      "prov:type": "Quality Review",
+      "prov:label": "Multi-stage Quality Review",
+      "prov:description": "We applied a multi-stage quality review pipeline including schema validation, deduplication, consistency checks, and cross-field integrity checks"
+    }
+  ]
+}
